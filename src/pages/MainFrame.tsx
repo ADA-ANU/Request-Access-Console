@@ -8,39 +8,36 @@ import DVlogo from "../resource/DVlogo.png";
 import {
   Layout,
   Menu,
-  DatePicker,
+  Typography,
   Alert,
   Spin,
-  Modal,
+  Form,
   Row,
   Badge,
   Tooltip,
   Affix,
   Avatar,
+  Skeleton,
   Button,
   Col,
   Dropdown,
 } from "antd";
 import { SystemStore } from "../stores/systemStore";
 import { IRoutingProps } from "../props.d";
-import OrderList from "../components/OrderList";
-import ProductList from "../components/ProductList";
-import OrderHistoryList from "../components/OrderHistoryList";
 import UserProfile from "./UserProfile";
 import authStore, { AuthStore } from "../stores/authStore";
-import { PrinterStore } from "../stores/printerStore";
 //import PrinterConfig from './PrinterConfig';
 import { UserOutlined, KeyOutlined } from "@ant-design/icons";
-
+import RequestAccessForm from "../components/RequestAccessForm";
+const { Title, Text } = Typography;
 const { Header, Content, Footer } = Layout;
 
 export interface IMainFrameProps extends IRoutingProps {
   systemStore?: SystemStore;
   authStore?: AuthStore;
-  printerStore?: PrinterStore;
 }
 
-@inject("systemStore", "routingStore", "authStore", "printerStore")
+@inject("systemStore", "routingStore", "authStore")
 @observer
 export default class MainFrame extends React.Component<IMainFrameProps> {
   componentDidMount() {
@@ -50,7 +47,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     this.props.authStore?.init(param);
   }
   render() {
-    let { systemStore, routingStore, printerStore } = this.props;
+    let { systemStore, routingStore } = this.props;
     const menu = (
       <Menu>
         <Menu.Item key="0" icon={<KeyOutlined />}>
@@ -68,7 +65,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     );
     return (
       // <Spin spinning={siteStore?siteStore.siteLoading : true} tip="Loading...">
-      <Spin spinning={false} tip="Loading...">
+      <Spin spinning={this.props.authStore?.isLoading} tip="Loading...">
         <Layout style={{ background: "#f0f2f5" }}>
           <Affix offsetTop={0}>
             <Header
@@ -146,7 +143,11 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             </Header>
           </Affix>
           <Content style={{ padding: "1%" }}>
-            asdfadsf
+            <Skeleton active={true} loading={this.props.authStore?.isLoading}>
+              <Title level={3}>Title</Title>
+              <RequestAccessForm />
+            </Skeleton>
+
             {
               // authStore? authStore.networkError === true?
               //     <Alert style={{textAlign: 'center'}} message={ authStore.networkErrorMessage.toString() } type="error" />
