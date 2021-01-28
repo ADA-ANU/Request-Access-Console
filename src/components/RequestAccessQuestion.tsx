@@ -64,7 +64,7 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
           },
         ]}
       >
-        <Select style={{ width: 120 }} allowClear>
+        <Select style={{ width: "100%" }} allowClear>
           {question.options.map((option: string) => (
             <Option value={option}>{option}</Option>
           ))}

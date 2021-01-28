@@ -1,5 +1,6 @@
 import React from "react";
 import { observable, action, computed, reaction } from "mobx";
+import { Modal } from "antd";
 import API_URL from "../config";
 import apiagent from "./apiagent";
 import systemStore from "./systemStore";
@@ -12,7 +13,13 @@ export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
   @observable test = false;
   @observable isLoading: boolean = false;
+  @observable submitting: boolean = false;
+  @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
+  @observable userFirstName: string | undefined;
+  @observable userLastName: string | undefined;
+  @observable datasetTitle: string | undefined;
+  @observable doi: string | undefined;
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
@@ -54,7 +61,12 @@ export class AuthStore {
         .then(
           action((json) => {
             console.log(json);
-            this.questions = json;
+            this.questions = json.guestbook;
+            const { firstname, lastname, dataset_title, DOI } = json.info;
+            this.userFirstName = firstname;
+            this.userLastName = lastname;
+            this.datasetTitle = dataset_title;
+            this.doi = DOI;
           })
         )
         .catch((error) => {
@@ -69,10 +81,21 @@ export class AuthStore {
         })
         .finally(
           action(() => {
-            setTimeout(() => (this.isLoading = false), 3000);
+            setTimeout(() => (this.isLoading = false), 1000);
           })
         );
     }
+  }
+
+  @action submit() {
+    this.submitting = true;
+    setTimeout(() => {
+      this.submitting = false;
+      this.result = true;
+      Modal.success({
+        title: "Your answers have been submitted, thank you. ",
+      });
+    }, 2000);
   }
 }
 

@@ -27,7 +27,7 @@ import { IRoutingProps } from "../props.d";
 import UserProfile from "./UserProfile";
 import authStore, { AuthStore } from "../stores/authStore";
 //import PrinterConfig from './PrinterConfig';
-import { UserOutlined, KeyOutlined } from "@ant-design/icons";
+import { UserOutlined, KeyOutlined, PoweroffOutlined } from "@ant-design/icons";
 import RequestAccessForm from "../components/RequestAccessForm";
 const { Title, Text } = Typography;
 const { Header, Content, Footer } = Layout;
@@ -104,48 +104,79 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   lg={{ span: 13, offset: 0 }}
                   xl={{ span: 13, offset: 0 }}
                   xxl={{ span: 13, offset: 0 }}
-                ></Col>
+                >
+                  <div
+                    style={{
+                      textAlign: "center",
+                      margin: "auto",
+                      paddingTop: "1%",
+                    }}
+                  >
+                    <Title level={3}>REQUEST ACCESS</Title>
+                  </div>
+                </Col>
                 <Col
                   xs={{ span: 1, offset: 0 }}
                   sm={{ span: 1, offset: 0 }}
                   md={{ span: 1, offset: 1 }}
                   lg={{ span: 1, offset: 1 }}
                   xl={{ span: 1, offset: 1 }}
-                  xxl={{ span: 1, offset: 1 }}
+                  xxl={{ span: 2, offset: 1 }}
                 >
-                  <div style={{ textAlign: "center" }}>
-                    <Dropdown
+                  <div style={{ textAlign: "right" }}>
+                    {/* <Dropdown
                       overlay={menu}
                       trigger={["click"]}
                       placement="bottomCenter"
-                    >
-                      <Badge count={0}>
-                        <Button
-                          type="primary"
-                          shape="circle"
-                          icon={<UserOutlined />}
-                        />
-                      </Badge>
-                    </Dropdown>
+                    > */}
+                    <Badge count={0}>
+                      <Button
+                        type="primary"
+                        shape="circle"
+                        icon={<UserOutlined />}
+                      />
+                    </Badge>
+                    {/* </Dropdown> */}
                   </div>
                 </Col>
                 <Col
-                  xs={{ span: 0, offset: 1 }}
-                  sm={{ span: 4, offset: 1 }}
+                  xs={{ span: 0, offset: 0 }}
+                  sm={{ span: 4, offset: 0 }}
                   md={{ span: 3, offset: 0 }}
-                  lg={{ span: 3, offset: 0 }}
-                  xl={{ span: 2, offset: 0 }}
+                  lg={{ span: 3, offset: 1 }}
+                  xl={{ span: 2, offset: 1 }}
                   xxl={{ span: 2, offset: 0 }}
                 >
-                  {/* <span>{user? user.userName: ""}</span> */}
+                  <div style={{ paddingLeft: "1vw" }}>
+                    <span>{`${authStore.userFirstName} ${authStore.userLastName}`}</span>
+                  </div>
                 </Col>
               </Row>
             </Header>
           </Affix>
           <Content style={{ padding: "1%" }}>
             <Skeleton active={true} loading={this.props.authStore?.isLoading}>
-              <Title level={3}>Title</Title>
+              <div
+                style={{
+                  paddingTop: "3vh",
+                  paddingBottom: "3vh",
+                  textAlign: "center",
+                }}
+              >
+                <Title level={3}>{authStore.datasetTitle}</Title>
+              </div>
+
               <RequestAccessForm />
+              <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                <Button
+                  type="primary"
+                  icon={<PoweroffOutlined />}
+                  loading={authStore.submitting}
+                  onClick={() => authStore.submit()}
+                >
+                  Submit!
+                </Button>
+              </div>
             </Skeleton>
 
             {

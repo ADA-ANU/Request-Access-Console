@@ -59,7 +59,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
   render() {
     const { authStore } = this.props;
     return (
-      <div>
+      <div style={{ margin: "auto", width: "50%", paddingTop: "3vh" }}>
         <Form
           id="dataverseFiles"
           ref={authStore?.formRef}
