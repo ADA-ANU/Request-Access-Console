@@ -21,7 +21,7 @@ const { TextArea } = Input;
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
-import { RequestAccessQuestion } from "../stores/data.d";
+import { RequestAccessQ } from "../stores/data.d";
 import { RouteComponentProps } from "react-router-dom";
 import { UploadFile, UploadListType } from "antd/lib/upload/interface";
 import systemStore from "../stores/systemStore";
@@ -30,7 +30,7 @@ import { NotificationPlacement } from "antd/lib/notification";
 //import DynamicFieldSet from "./dynamicFields";
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
-
+import RequestAccessQuestion from "./RequestAccessQuestion";
 // interface ReturnFileType{
 //     name: string
 // }
@@ -58,20 +58,22 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
 
   render() {
     const { authStore } = this.props;
-    console.log(authStore);
     return (
-      <Form
-        id="dataverseFiles"
-        ref={this.RAFormRef}
-        scrollToFirstError={true}
-        onFinish={this.handleSubmit}
-      >
-        {authStore?.questions && authStore.questions.length > 0
-          ? authStore?.questions.map((q) => {
-              console.log(q);
-            })
-          : () => console.log("null")}
-      </Form>
+      <div>
+        <Form
+          id="dataverseFiles"
+          ref={authStore?.formRef}
+          layout="vertical"
+          scrollToFirstError={true}
+          onFinish={this.handleSubmit}
+        >
+          {authStore?.questions &&
+            authStore.questions.length > 0 &&
+            authStore?.questions.map((q) => (
+              <RequestAccessQuestion question={q} />
+            ))}
+        </Form>
+      </div>
     );
   }
 }

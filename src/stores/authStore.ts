@@ -1,21 +1,22 @@
+import React from "react";
 import { observable, action, computed, reaction } from "mobx";
 import API_URL from "../config";
 import apiagent from "./apiagent";
 import systemStore from "./systemStore";
-import { AdminType, RestaurantType, RequestAccessQuestion } from "./data";
+import { AdminType, RestaurantType, RequestAccessQ } from "./data";
 import { setWsHeartbeat } from "ws-heartbeat/client";
 import routingStore from "./routingStore";
 import moment from "moment";
-
+import { FormInstance } from "antd/lib/form";
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
   @observable test = false;
   @observable isLoading: boolean = false;
-  @observable questions?: Array<RequestAccessQuestion>;
+  @observable questions?: Array<RequestAccessQ>;
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
-
+  @observable formRef = React.createRef<FormInstance>();
   constructor() {
     this.initApp();
   }

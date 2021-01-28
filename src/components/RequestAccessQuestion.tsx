@@ -17,7 +17,6 @@ import {
   message,
   notification,
 } from "antd";
-const { TextArea } = Input;
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
@@ -30,7 +29,8 @@ import { NotificationPlacement } from "antd/lib/notification";
 //import DynamicFieldSet from "./dynamicFields";
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
-
+const { Option } = Select;
+const { TextArea } = Input;
 // interface ReturnFileType{
 //     name: string
 // }
@@ -42,7 +42,7 @@ interface RequestAccessQuestionProps {
 @inject("authStore")
 @observer
 export default class RequestAccessQuestion extends React.Component<RequestAccessQuestionProps> {
-  RAFormRef = React.createRef<FormInstance>();
+  //RAFormRef = React.createRef<FormInstance>();
   handleCancel = () => {
     //this.props.form.resetFields();
   };
@@ -51,21 +51,38 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
   };
 
   render() {
-    const { authStore } = this.props;
+    const { authStore, question } = this.props;
     console.log(authStore);
-    return (
-      <Form
-        id="dataverseFiles"
-        ref={this.RAFormRef}
-        scrollToFirstError={true}
-        onFinish={this.handleSubmit}
+    return question && question.questiontype === "options" ? (
+      <Form.Item
+        name={question.questionstring}
+        label={question.questionstring}
+        rules={[
+          {
+            required: question.required,
+            message: "Please input your E-mail!",
+          },
+        ]}
       >
-        {authStore?.questions && authStore.questions.length > 0
-          ? authStore?.questions.map((q) => {
-              console.log(q);
-            })
-          : () => console.log("null")}
-      </Form>
+        <Select style={{ width: 120 }} allowClear>
+          {question.options.map((option: string) => (
+            <Option value={option}>{option}</Option>
+          ))}
+        </Select>
+      </Form.Item>
+    ) : (
+      <Form.Item
+        name={question.questionstring}
+        label={question.questionstring}
+        rules={[
+          {
+            required: question.required,
+            message: "Please input your E-mail!",
+          },
+        ]}
+      >
+        <TextArea rows={4} />
+      </Form.Item>
     );
   }
 }
