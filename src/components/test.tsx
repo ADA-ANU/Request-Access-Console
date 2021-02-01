@@ -29,8 +29,6 @@ import { NotificationPlacement } from "antd/lib/notification";
 //import DynamicFieldSet from "./dynamicFields";
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
-import Options from "./options";
-import Text from "./test";
 const { Option } = Select;
 const { TextArea } = Input;
 // interface ReturnFileType{
@@ -38,27 +36,27 @@ const { TextArea } = Input;
 // }
 interface RequestAccessQuestionProps {
   question: RequestAccessQ;
-  authStore?: AuthStore;
 }
 
 @inject("authStore")
 @observer
-export default class RequestAccessQuestion extends React.Component<RequestAccessQuestionProps> {
-  //RAFormRef = React.createRef<FormInstance>();
-  handleCancel = () => {
-    //this.props.form.resetFields();
-  };
-  handleSubmit = (e: any) => {
-    e.preventDefault();
-  };
-
+export default class Text extends React.Component<RequestAccessQuestionProps> {
   render() {
-    const { authStore, question } = this.props;
-    console.log(authStore);
-    return question && question.questiontype === "options" ? (
-      <Options question={question} />
-    ) : (
-      <Text question={question} />
+    const { question } = this.props;
+    //console.log(authStore);
+    return (
+      <Form.Item
+        name={question.questionstring}
+        label={question.questionstring}
+        rules={[
+          {
+            required: question.required,
+            message: "This field cannot be empty.",
+          },
+        ]}
+      >
+        <TextArea rows={4} />
+      </Form.Item>
     );
   }
 }

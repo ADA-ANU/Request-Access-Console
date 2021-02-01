@@ -69,9 +69,10 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
         >
           {authStore?.questions &&
             authStore.questions.length > 0 &&
-            authStore?.questions.map((q) => (
-              <RequestAccessQuestion question={q} />
-            ))}
+            authStore?.questions.map(
+              (q) =>
+                q.hidden === false && <RequestAccessQuestion question={q} />
+            )}
         </Form>
       </div>
     );
