@@ -66,6 +66,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
           layout="vertical"
           scrollToFirstError={true}
           onFinish={this.handleSubmit}
+          initialValues={authStore?.responseValues}
         >
           {authStore?.questions &&
             authStore.questions.length > 0 &&

@@ -24,6 +24,8 @@ export class AuthStore {
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
   @observable formRef = React.createRef<FormInstance>();
+  @observable responseValues: object = {};
+
   constructor() {
     this.initApp();
   }
@@ -60,14 +62,11 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json.guestbook.guestbook);
-            this.questions = json.guestbook.guestbook;
-            const {
-              firstname,
-              lastname,
-              dataset_title,
-              DOI,
-            } = json.guestbook.info;
+            console.log(json.guestbook);
+            console.log(json.responseValues);
+            this.responseValues = json.responseValues;
+            this.questions = json.guestbook;
+            const { firstname, lastname, dataset_title, DOI } = json.info;
             this.userFirstName = firstname;
             this.userLastName = lastname;
             this.datasetTitle = dataset_title;

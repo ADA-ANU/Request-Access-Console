@@ -17,6 +17,8 @@ export interface RequestAccessQ {
   questiontype: string;
   required: boolean;
   options: Array;
+  questionid: number;
+  guestbookid: number;
 }
 export interface AdminType {
   id: number;

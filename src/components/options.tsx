@@ -47,7 +47,7 @@ export default class Options extends React.Component<RequestAccessQuestionProps>
     return (
       <Form.Item
         key={question.displayorder}
-        name={question.displayorder}
+        name={question.questionid}
         label={question.questionstring}
         rules={[
           {
