@@ -30,7 +30,7 @@ import { NotificationPlacement } from "antd/lib/notification";
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 import Options from "./options";
-import Text from "./test";
+import Text from "./text";
 const { Option } = Select;
 const { TextArea } = Input;
 // interface ReturnFileType{
@@ -39,6 +39,7 @@ const { TextArea } = Input;
 interface RequestAccessQuestionProps {
   question: RequestAccessQ;
   authStore?: AuthStore;
+  key: number;
 }
 
 @inject("authStore")
@@ -54,7 +55,7 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
 
   render() {
     const { authStore, question } = this.props;
-    console.log(authStore);
+    //console.log(authStore);
     return question && question.questiontype === "options" ? (
       <Options question={question} />
     ) : (

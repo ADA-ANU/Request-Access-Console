@@ -168,14 +168,36 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
 
               <RequestAccessForm />
               <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                <Button
-                  type="primary"
-                  icon={<PoweroffOutlined />}
-                  loading={authStore.submitting}
-                  onClick={() => authStore.submit()}
-                >
-                  Submit!
-                </Button>
+                <Row justify="center">
+                  <Col span={2} offset={0}>
+                    <Button
+                      //form="requestAccess"
+                      key="save"
+                      htmlType="button"
+                      type="primary"
+                      //icon={<PoweroffOutlined />}
+                      loading={authStore.submitting}
+                      onClick={() => authStore.save()}
+                    >
+                      Save!
+                    </Button>
+                  </Col>
+                  <Col span={2} offset={1}>
+                    <div>
+                      <Button
+                        //form="requestAccess"
+                        key="submit"
+                        htmlType="submit"
+                        type="primary"
+                        icon={<PoweroffOutlined />}
+                        loading={authStore.submitting}
+                        onClick={() => authStore.submit()}
+                      >
+                        Submit!
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
               </div>
             </Skeleton>
 

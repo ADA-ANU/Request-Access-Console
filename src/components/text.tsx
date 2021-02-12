@@ -20,7 +20,7 @@ import {
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
-import { RequestAccessQ } from "../stores/data.d";
+import { RequestAccessQ } from "../stores/data";
 import { RouteComponentProps } from "react-router-dom";
 import { UploadFile, UploadListType } from "antd/lib/upload/interface";
 import systemStore from "../stores/systemStore";
@@ -46,7 +46,8 @@ export default class Text extends React.Component<RequestAccessQuestionProps> {
     //console.log(authStore);
     return (
       <Form.Item
-        name={question.questionstring}
+        key={question.displayorder}
+        name={question.displayorder}
         label={question.questionstring}
         rules={[
           {

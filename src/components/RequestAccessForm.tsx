@@ -52,8 +52,8 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
   handleCancel = () => {
     //this.props.form.resetFields();
   };
-  handleSubmit = (e: any) => {
-    e.preventDefault();
+  handleSubmit = (values: any) => {
+    console.log("Received values of form: ", values);
   };
 
   render() {
@@ -61,7 +61,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
     return (
       <div style={{ margin: "auto", width: "50%", paddingTop: "3vh" }}>
         <Form
-          id="dataverseFiles"
+          id="requestAccess"
           ref={authStore?.formRef}
           layout="vertical"
           scrollToFirstError={true}
@@ -70,8 +70,10 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
           {authStore?.questions &&
             authStore.questions.length > 0 &&
             authStore?.questions.map(
-              (q) =>
-                q.hidden === false && <RequestAccessQuestion question={q} />
+              (q, index) =>
+                q.hidden === false && (
+                  <RequestAccessQuestion question={q} key={index} />
+                )
             )}
         </Form>
       </div>

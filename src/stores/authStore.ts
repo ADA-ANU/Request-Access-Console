@@ -60,9 +60,14 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json);
-            this.questions = json.guestbook;
-            const { firstname, lastname, dataset_title, DOI } = json.info;
+            console.log(json.guestbook.guestbook);
+            this.questions = json.guestbook.guestbook;
+            const {
+              firstname,
+              lastname,
+              dataset_title,
+              DOI,
+            } = json.guestbook.info;
             this.userFirstName = firstname;
             this.userLastName = lastname;
             this.datasetTitle = dataset_title;
@@ -94,6 +99,17 @@ export class AuthStore {
       this.result = true;
       Modal.success({
         title: "Your answers have been submitted, thank you. ",
+      });
+    }, 2000);
+  }
+
+  @action save() {
+    this.submitting = true;
+    setTimeout(() => {
+      this.submitting = false;
+      this.result = true;
+      Modal.success({
+        title: "Your answers have been saved. ",
       });
     }, 2000);
   }

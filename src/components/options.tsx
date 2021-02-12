@@ -46,6 +46,7 @@ export default class Options extends React.Component<RequestAccessQuestionProps>
     //console.log(authStore);
     return (
       <Form.Item
+        key={question.displayorder}
         name={question.displayorder}
         label={question.questionstring}
         rules={[
@@ -57,7 +58,9 @@ export default class Options extends React.Component<RequestAccessQuestionProps>
       >
         <Select style={{ width: "100%" }} allowClear>
           {question.options.map((option: string) => (
-            <Option value={option}>{option}</Option>
+            <Option key={option} value={option}>
+              {option}
+            </Option>
           ))}
         </Select>
       </Form.Item>
