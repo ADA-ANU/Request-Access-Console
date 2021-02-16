@@ -191,7 +191,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                         type="primary"
                         icon={<PoweroffOutlined />}
                         loading={authStore.submitting}
-                        onClick={() => authStore.submit()}
+                        //onClick={() => authStore.submit()}
                       >
                         Submit!
                       </Button>

@@ -10,6 +10,7 @@ process.env.NODE_ENV === "production"
 const API_URL = {
   ROOT_URL: API_ROOT_URL,
   INIT: "requestAccess/init",
+  SAVERESPONSES: "api/saveResponses",
   DEFAULT_PRINT_SERVICE: "http://localhost:9099",
   PRINTER_STATUS: `http://localhost:9099/printerStatus`,
   SITE: "/api/site",

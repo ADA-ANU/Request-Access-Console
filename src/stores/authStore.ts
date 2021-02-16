@@ -9,6 +9,7 @@ import { setWsHeartbeat } from "ws-heartbeat/client";
 import routingStore from "./routingStore";
 import moment from "moment";
 import { FormInstance } from "antd/lib/form";
+import { convertCompilerOptionsFromJson } from "typescript";
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
   @observable test = false;
@@ -25,7 +26,7 @@ export class AuthStore {
   @observable companyShops: Array<RestaurantType> = [];
   @observable formRef = React.createRef<FormInstance>();
   @observable responseValues: object = {};
-
+  @observable token: string | undefined;
   constructor() {
     this.initApp();
   }
@@ -55,6 +56,7 @@ export class AuthStore {
 
   @action init(token: string | undefined) {
     if (token) {
+      this.token = token;
       this.isLoading = true;
       apiagent
         .post(API_URL.INIT, {
@@ -64,6 +66,7 @@ export class AuthStore {
           action((json) => {
             console.log(json.guestbook);
             console.log(json.responseValues);
+            console.log(json.info);
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
             const { firstname, lastname, dataset_title, DOI } = json.info;
@@ -103,14 +106,47 @@ export class AuthStore {
   }
 
   @action save() {
-    this.submitting = true;
-    setTimeout(() => {
-      this.submitting = false;
-      this.result = true;
-      Modal.success({
-        title: "Your answers have been saved. ",
+    if (!this.token) {
+      return alert("Session expired, please reload the page ... ");
+    }
+    this.formRef.current
+      ?.validateFields()
+      .then((values) => {
+        this.submitting = true;
+        console.log(values);
+        apiagent
+          .post(API_URL.SAVERESPONSES, {
+            token: this.token,
+            responses: values,
+          })
+          .then(action((json) => {}))
+          .catch((error) => {
+            console.log(error);
+            if (error.status === 401) {
+              alert("Email or password is incorrect, please try again ... ");
+            } else {
+              alert("Sign In Error, please refresh page and try again ... ");
+              // systemStore.networkError = true
+              // systemStore.networkErrorInfo = error
+            }
+          })
+          .finally(
+            action(() => {
+              setTimeout(() => (this.submitting = false), 1000);
+            })
+          );
+      })
+      .catch((errorInfo) => {
+        console.log(errorInfo);
       });
-    }, 2000);
+
+    // setTimeout(() => {
+    //   this.submitting = false;
+    //   this.result = true;
+    //   Modal.success({
+    //     title: "Your answers have been saved. ",
+    //   });
+    // }, 2000);
   }
 }
 
