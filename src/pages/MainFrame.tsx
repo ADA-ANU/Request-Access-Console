@@ -5,6 +5,7 @@ import ADAlogo from "../resource/ADA-logo.png";
 import ANUlogo from "../resource/ANUlogo.png";
 import Vertical_line from "../resource/vertical-line.js";
 import DVlogo from "../resource/DVlogo.png";
+import warningLogo from "../resource/warningLogo.png";
 import {
   Layout,
   Menu,
@@ -148,58 +149,90 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   xxl={{ span: 2, offset: 0 }}
                 >
                   <div style={{ paddingLeft: "1vw" }}>
-                    <span>{`${authStore.userFirstName} ${authStore.userLastName}`}</span>
+                    <span>
+                      {authStore.userFirstName && authStore.userLastName
+                        ? `${authStore.userFirstName} ${authStore.userLastName}`
+                        : "Guest"}
+                    </span>
                   </div>
                 </Col>
               </Row>
             </Header>
           </Affix>
           <Content style={{ padding: "1%" }}>
-            <Skeleton active={true} loading={this.props.authStore?.isLoading}>
-              <div
-                style={{
-                  paddingTop: "3vh",
-                  paddingBottom: "3vh",
-                  textAlign: "center",
-                }}
-              >
-                <Title level={3}>{authStore.datasetTitle}</Title>
-              </div>
-
-              <RequestAccessForm />
-              <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                <Row justify="center">
-                  <Col span={2} offset={0}>
-                    <Button
-                      //form="requestAccess"
-                      key="save"
-                      htmlType="button"
-                      type="primary"
-                      //icon={<PoweroffOutlined />}
-                      loading={authStore.submitting}
-                      onClick={() => authStore.save()}
-                    >
-                      Save!
-                    </Button>
-                  </Col>
-                  <Col span={2} offset={1}>
-                    <div>
+            {authStore.authenticated ? (
+              <Skeleton active={true} loading={this.props.authStore?.isLoading}>
+                <div
+                  style={{
+                    paddingTop: "3vh",
+                    paddingBottom: "3vh",
+                    textAlign: "center",
+                  }}
+                >
+                  <Title level={3}>{authStore.datasetTitle}</Title>
+                </div>
+                {this.props.authStore?.submitted ? (
+                  <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                    <Title level={4}>This form has been submitted.</Title>
+                  </div>
+                ) : null}
+                <RequestAccessForm />
+                <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                  <Row justify="center">
+                    <Col span={2} offset={0}>
                       <Button
                         //form="requestAccess"
-                        key="submit"
-                        htmlType="submit"
+                        key="save"
+                        htmlType="button"
                         type="primary"
-                        icon={<PoweroffOutlined />}
+                        //icon={<PoweroffOutlined />}
                         loading={authStore.submitting}
-                        //onClick={() => authStore.submit()}
+                        onClick={() => authStore.save()}
+                        disabled={authStore.submitted}
                       >
-                        Submit!
+                        Save!
                       </Button>
-                    </div>
-                  </Col>
-                </Row>
+                    </Col>
+                    <Col span={2} offset={1}>
+                      <div>
+                        <Button
+                          form="requestAccess"
+                          key="submit"
+                          htmlType="submit"
+                          type="primary"
+                          icon={<PoweroffOutlined />}
+                          loading={authStore.submitting}
+                          disabled={authStore.submitted}
+                          //onClick={() => authStore.submit()}
+                        >
+                          Submit!
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              </Skeleton>
+            ) : (
+              <div
+                style={{
+                  textAlign: "center",
+                  paddingTop: "5vh",
+                  marginBottom: "10vh",
+                }}
+              >
+                <img
+                  className="warning"
+                  style={{
+                    height: "200px",
+                    lineHeight: "200px",
+                    marginTop: "10vh",
+                    marginBottom: "8vh",
+                  }}
+                  src={warningLogo}
+                />
+                <Title level={3}>{authStore.errorMsg}</Title>
               </div>
-            </Skeleton>
+            )}
 
             {
               // authStore? authStore.networkError === true?

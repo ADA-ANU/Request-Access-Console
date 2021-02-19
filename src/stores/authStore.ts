@@ -1,6 +1,6 @@
 import React from "react";
 import { observable, action, computed, reaction } from "mobx";
-import { Modal } from "antd";
+import { Modal, notification } from "antd";
 import API_URL from "../config";
 import apiagent from "./apiagent";
 import systemStore from "./systemStore";
@@ -15,6 +15,7 @@ export class AuthStore {
   @observable test = false;
   @observable isLoading: boolean = false;
   @observable submitting: boolean = false;
+  @observable submitted: boolean = false;
   @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
   @observable userFirstName: string | undefined;
@@ -27,6 +28,8 @@ export class AuthStore {
   @observable formRef = React.createRef<FormInstance>();
   @observable responseValues: object = {};
   @observable token: string | undefined;
+  @observable authenticated: boolean = true;
+  @observable errorMsg: string | undefined;
   constructor() {
     this.initApp();
   }
@@ -74,16 +77,19 @@ export class AuthStore {
             this.userLastName = lastname;
             this.datasetTitle = dataset_title;
             this.doi = DOI;
+            this.submitted = json.submitted;
           })
         )
         .catch((error) => {
           console.log(error);
           if (error.status === 401) {
-            alert("Email or password is incorrect, please try again ... ");
+            this.authenticated = false;
+            this.errorMsg =
+              "Session expired, please proceed to Dataverse to start over again.";
+
+            //alert(error.data);
           } else {
-            alert("Sign In Error, please refresh page and try again ... ");
-            // systemStore.networkError = true
-            // systemStore.networkErrorInfo = error
+            this.openNotification(error.data);
           }
         })
         .finally(
@@ -94,15 +100,35 @@ export class AuthStore {
     }
   }
 
-  @action submit() {
+  @action submit(values: object) {
     this.submitting = true;
-    setTimeout(() => {
-      this.submitting = false;
-      this.result = true;
-      Modal.success({
-        title: "Your answers have been submitted, thank you. ",
-      });
-    }, 2000);
+    console.log(values);
+    apiagent
+      .post(API_URL.SUBMITRESPONSES, {
+        token: this.token,
+        responses: values,
+      })
+      .then(
+        action((json) => {
+          console.log(json);
+          this.submitted = true;
+        })
+      )
+      .catch((error) => {
+        console.log(error);
+        if (error.status === 401) {
+          this.authenticated = false;
+          this.errorMsg =
+            "Session expired, please proceed to Dataverse to start over again.";
+        } else {
+          this.openNotification(error.data);
+        }
+      })
+      .finally(
+        action(() => {
+          setTimeout(() => (this.submitting = false), 1000);
+        })
+      );
   }
 
   @action save() {
@@ -123,11 +149,11 @@ export class AuthStore {
           .catch((error) => {
             console.log(error);
             if (error.status === 401) {
-              alert("Email or password is incorrect, please try again ... ");
+              this.authenticated = false;
+              this.errorMsg =
+                "Session expired, please proceed to Dataverse to start over again.";
             } else {
-              alert("Sign In Error, please refresh page and try again ... ");
-              // systemStore.networkError = true
-              // systemStore.networkErrorInfo = error
+              this.openNotification(error.data);
             }
           })
           .finally(
@@ -148,6 +174,13 @@ export class AuthStore {
     //   });
     // }, 2000);
   }
+
+  openNotification = (msg: string) => {
+    notification.error({
+      message: `Oops`,
+      description: msg,
+    });
+  };
 }
 
 export default new AuthStore();

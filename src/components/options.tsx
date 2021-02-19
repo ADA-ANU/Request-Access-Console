@@ -36,13 +36,14 @@ const { TextArea } = Input;
 // }
 interface RequestAccessQuestionProps {
   question: RequestAccessQ;
+  authStore?: AuthStore;
 }
 
 @inject("authStore")
 @observer
 export default class Options extends React.Component<RequestAccessQuestionProps> {
   render() {
-    const { question } = this.props;
+    const { question, authStore } = this.props;
     //console.log(authStore);
     return (
       <Form.Item
@@ -56,7 +57,11 @@ export default class Options extends React.Component<RequestAccessQuestionProps>
           },
         ]}
       >
-        <Select style={{ width: "100%" }} allowClear>
+        <Select
+          style={{ width: "100%" }}
+          allowClear
+          disabled={authStore?.submitted}
+        >
           {question.options.map((option: string) => (
             <Option key={option} value={option}>
               {option}

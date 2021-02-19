@@ -36,13 +36,14 @@ const { TextArea } = Input;
 // }
 interface RequestAccessQuestionProps {
   question: RequestAccessQ;
+  authStore?: AuthStore;
 }
 
 @inject("authStore")
 @observer
 export default class Text extends React.Component<RequestAccessQuestionProps> {
   render() {
-    const { question } = this.props;
+    const { question, authStore } = this.props;
     //console.log(authStore);
     return (
       <Form.Item
@@ -56,7 +57,7 @@ export default class Text extends React.Component<RequestAccessQuestionProps> {
           },
         ]}
       >
-        <TextArea rows={4} />
+        <TextArea rows={4} disabled={authStore?.submitted} />
       </Form.Item>
     );
   }
