@@ -89,7 +89,11 @@ export class AuthStore {
 
             //alert(error.data);
           } else {
-            this.openNotification(error.data);
+            //this.openNotification(error.data);
+            this.authenticated = false;
+            this.errorMsg = error.data
+              ? error.data
+              : "Server error, please try again.";
           }
         })
         .finally(

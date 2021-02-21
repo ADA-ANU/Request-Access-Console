@@ -28,15 +28,15 @@ export const apiagent = (options) => {
   );
 
   // Add a response interceptor
-  request.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response.status >= 500) {
-        message.error("Server Error, please try again.", 10);
-      }
-      return Promise.reject(error);
-    }
-  );
+  // request.interceptors.response.use(
+  //   (response) => response,
+  //   (error) => {
+  //     if (error.response.status >= 500) {
+  //       message.error("Server Error, please try again.", 10);
+  //     }
+  //     return Promise.reject(error);
+  //   }
+  // );
 
   //@ts-ignore
   const onSuccess = function (response) {
