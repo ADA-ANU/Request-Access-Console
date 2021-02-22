@@ -177,40 +177,42 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   </div>
                 ) : null}
                 <RequestAccessForm />
-                <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                  <Row justify="center">
-                    <Col span={2} offset={0}>
-                      <Button
-                        //form="requestAccess"
-                        key="save"
-                        htmlType="button"
-                        type="primary"
-                        //icon={<PoweroffOutlined />}
-                        loading={authStore.submitting}
-                        onClick={() => authStore.save()}
-                        disabled={authStore.submitted}
-                      >
-                        Save!
-                      </Button>
-                    </Col>
-                    <Col span={2} offset={1}>
-                      <div>
+                {!authStore.submitted ? (
+                  <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                    <Row justify="center">
+                      <Col span={2} offset={0}>
                         <Button
-                          form="requestAccess"
-                          key="submit"
-                          htmlType="submit"
+                          //form="requestAccess"
+                          key="save"
+                          htmlType="button"
                           type="primary"
-                          icon={<PoweroffOutlined />}
+                          //icon={<PoweroffOutlined />}
                           loading={authStore.submitting}
+                          onClick={() => authStore.save()}
                           disabled={authStore.submitted}
-                          //onClick={() => authStore.submit()}
                         >
-                          Submit!
+                          Save!
                         </Button>
-                      </div>
-                    </Col>
-                  </Row>
-                </div>
+                      </Col>
+                      <Col span={2} offset={1}>
+                        <div>
+                          <Button
+                            form="requestAccess"
+                            key="submit"
+                            htmlType="submit"
+                            type="primary"
+                            icon={<PoweroffOutlined />}
+                            loading={authStore.submitting}
+                            disabled={authStore.submitted}
+                            //onClick={() => authStore.submit()}
+                          >
+                            Submit!
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </div>
+                ) : null}
               </Skeleton>
             ) : (
               <div

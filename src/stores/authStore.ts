@@ -69,7 +69,7 @@ export class AuthStore {
           action((json) => {
             console.log(json.guestbook);
             console.log(json.responseValues);
-            console.log(json.info);
+            console.log(json.info, json.submitted);
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
             const { firstname, lastname, dataset_title, DOI } = json.info;
