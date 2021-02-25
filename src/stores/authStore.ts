@@ -10,6 +10,8 @@ import routingStore from "./routingStore";
 import moment from "moment";
 import { FormInstance } from "antd/lib/form";
 import { convertCompilerOptionsFromJson } from "typescript";
+import { ResultType } from "../stores/data.d";
+
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
   @observable test = false;
@@ -116,6 +118,7 @@ export class AuthStore {
         action((json) => {
           console.log(json);
           this.submitted = true;
+          this.resultModal("submit");
         })
       )
       .catch((error) => {
@@ -149,7 +152,11 @@ export class AuthStore {
             token: this.token,
             responses: values,
           })
-          .then(action((json) => {}))
+          .then(
+            action((json) => {
+              this.resultModal("save");
+            })
+          )
           .catch((error) => {
             console.log(error);
             if (error.status === 401) {
@@ -178,7 +185,14 @@ export class AuthStore {
     //   });
     // }, 2000);
   }
-
+  resultModal = (type: string) => {
+    Modal.success({
+      title:
+        type === "save"
+          ? `Your answers have been saved, a confirmation email has been sent to your registed email address.`
+          : `Your answers have been submitted.`,
+    });
+  };
   openNotification = (msg: string) => {
     notification.error({
       message: `Oops`,

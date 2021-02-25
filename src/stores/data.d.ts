@@ -20,6 +20,10 @@ export interface RequestAccessQ {
   questionid: number;
   guestbookid: number;
 }
+export interface ResultType {
+  type: "save" | "submit";
+}
+
 export interface AdminType {
   id: number;
   name: string;
