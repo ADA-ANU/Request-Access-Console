@@ -45,7 +45,9 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     const pathname = this.props.routingStore?.location.pathname;
     const param = pathname?.split("/")[1];
     console.log(param);
-    this.props.authStore?.init(param);
+    if (!param || param === "") {
+      this.props.authStore?.unauthorised("No guestbook was found.");
+    } else this.props.authStore?.init(param);
   }
   render() {
     let { systemStore, routingStore } = this.props;

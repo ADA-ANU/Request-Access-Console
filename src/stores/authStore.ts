@@ -83,17 +83,22 @@ export class AuthStore {
         .catch((error) => {
           console.log(error);
           if (error.status === 401) {
-            this.authenticated = false;
-            this.errorMsg =
-              "Session expired, please proceed to Dataverse to start over again.";
-
+            // this.authenticated = false;
+            // this.errorMsg =
+            //   "Session expired, please proceed to Dataverse to start over again.";
+            this.unauthorised(
+              "Session expired, please proceed to Dataverse to start over again."
+            );
             //alert(error.data);
           } else {
+            this.unauthorised(
+              error.data ? error.data : "Server error, please try again."
+            );
             //this.openNotification(error.data);
-            this.authenticated = false;
-            this.errorMsg = error.data
-              ? error.data
-              : "Server error, please try again.";
+            // this.authenticated = false;
+            // this.errorMsg = error.data
+            //   ? error.data
+            //   : "Server error, please try again.";
           }
         })
         .finally(
@@ -102,6 +107,11 @@ export class AuthStore {
           })
         );
     }
+  }
+
+  @action unauthorised(value: string) {
+    this.authenticated = false;
+    this.errorMsg = value;
   }
 
   @action submit(values: object) {
