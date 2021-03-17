@@ -31,6 +31,7 @@ import { NotificationPlacement } from "antd/lib/notification";
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 import RequestAccessQuestion from "./RequestAccessQuestion";
+import DataFile from "./dataFile";
 // interface ReturnFileType{
 //     name: string
 // }
@@ -77,6 +78,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
                   <RequestAccessQuestion question={q} key={index} />
                 )
             )}
+          {authStore?.dataFiles && <DataFile />}
         </Form>
       </div>
     );

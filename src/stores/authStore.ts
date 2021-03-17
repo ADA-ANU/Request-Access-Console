@@ -10,7 +10,7 @@ import routingStore from "./routingStore";
 import moment from "moment";
 import { FormInstance } from "antd/lib/form";
 import { convertCompilerOptionsFromJson } from "typescript";
-import { ResultType } from "../stores/data.d";
+import { ResultType, dataFiles } from "../stores/data.d";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -24,6 +24,7 @@ export class AuthStore {
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
   @observable doi: string | undefined;
+  @observable dataFiles: Array<dataFiles> = [];
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
@@ -32,6 +33,9 @@ export class AuthStore {
   @observable token: string | undefined;
   @observable authenticated: boolean = true;
   @observable errorMsg: string | undefined;
+  @observable checkedDataFiles: Array<string> = [];
+  @observable checkall: boolean = false;
+  @observable indeterminate: boolean = true;
   constructor() {
     this.initApp();
   }
@@ -72,6 +76,8 @@ export class AuthStore {
             console.log(json.guestbook);
             console.log(json.responseValues);
             console.log(json.info, json.submitted);
+            console.log(json.dataFiles);
+            this.dataFiles = json.dataFiles;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
             const { firstname, lastname, dataset_title, DOI } = json.info;
@@ -195,6 +201,18 @@ export class AuthStore {
     //   });
     // }, 2000);
   }
+  onChange = (list: any) => {
+    this.checkedDataFiles = list;
+    this.indeterminate = !!list.length && list.length < this.dataFiles.length;
+    this.checkall = list.length === this.dataFiles.length;
+  };
+  onCheckAllChange = (e: any) => {
+    this.checkedDataFiles = e.target.checked
+      ? this.dataFiles.map((d) => d.label)
+      : [];
+    this.indeterminate = false;
+    this.checkall = e.target.checked;
+  };
   resultModal = (type: string) => {
     Modal.success({
       title:

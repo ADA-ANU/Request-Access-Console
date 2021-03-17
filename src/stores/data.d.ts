@@ -20,6 +20,14 @@ export interface RequestAccessQ {
   questionid: number;
   guestbookid: number;
 }
+
+export interface dataFiles {
+  id: number;
+  label: string;
+  restricted: boolean;
+  authenticated_user_id: number;
+  assigneeidentifier: number;
+}
 export interface ResultType {
   type: "save" | "submit";
 }
