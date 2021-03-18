@@ -27,6 +27,8 @@ export interface dataFiles {
   restricted: boolean;
   authenticated_user_id: number;
   assigneeidentifier: number;
+  value: number;
+  disabled: boolean;
 }
 export interface ResultType {
   type: "save" | "submit";

@@ -8,6 +8,7 @@ import {
   Input,
   message,
   notification,
+  Typography,
 } from "antd";
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
@@ -19,6 +20,7 @@ import systemStore from "../stores/systemStore";
 import { action, toJS } from "mobx";
 import { NotificationPlacement } from "antd/lib/notification";
 //import DynamicFieldSet from "./dynamicFields";
+const { Title, Text } = Typography;
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 const CheckboxGroup = Checkbox.Group;
@@ -34,22 +36,28 @@ interface DataFileProps {
 export default class DataFile extends React.Component<DataFileProps> {
   render() {
     const { authStore } = this.props;
-    //console.log(authStore);
+    console.log(authStore?.checkedDataFiles);
+
     return (
       <>
-        <Checkbox
-          indeterminate={authStore?.indeterminate}
-          onChange={authStore?.onCheckAllChange}
-          checked={authStore?.checkall}
-        >
-          Check all
-        </Checkbox>
-        <Divider />
-        <CheckboxGroup
-          options={authStore?.dataFiles.map((d) => d.label)}
-          value={authStore?.checkedDataFiles}
-          onChange={authStore?.onChange}
-        />
+        <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+          <Title level={4}>Request access for files in the same dataset</Title>
+        </div>
+        <div style={{ paddingTop: "4vh" }}>
+          <Checkbox
+            indeterminate={authStore?.indeterminate}
+            onChange={authStore?.onCheckAllChange}
+            checked={authStore?.checkall}
+          >
+            Check all
+          </Checkbox>
+          <Divider />
+          <CheckboxGroup
+            options={authStore?.dataFiles}
+            value={authStore?.checkedDataFiles}
+            onChange={authStore?.onChange}
+          />
+        </div>
       </>
     );
   }

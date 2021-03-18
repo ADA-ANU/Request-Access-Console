@@ -33,7 +33,8 @@ export class AuthStore {
   @observable token: string | undefined;
   @observable authenticated: boolean = true;
   @observable errorMsg: string | undefined;
-  @observable checkedDataFiles: Array<string> = [];
+  @observable checkedDataFiles: Array<number> = [];
+  @observable inputCheckedDataFiles: Array<number> = [];
   @observable checkall: boolean = false;
   @observable indeterminate: boolean = true;
   constructor() {
@@ -77,7 +78,20 @@ export class AuthStore {
             console.log(json.responseValues);
             console.log(json.info, json.submitted);
             console.log(json.dataFiles);
-            this.dataFiles = json.dataFiles;
+            const dfs = json.dataFiles.map((d: any) => {
+              d["value"] = d.id;
+              if (d.assigneeidentifier || d.authenticated_user_id)
+                d.disabled = true;
+              else d.disabled = false;
+              if (d.assigneeidentifier) d.label += "(Approved)";
+              if (d.authenticated_user_id) d.label += "(Requested)";
+              if (json.info.inputDataFileIDs.includes(d.id)) d.disabled = true;
+              return d;
+            });
+            //console.log(dfs);
+            this.dataFiles = dfs;
+            this.checkedDataFiles = json.info.inputDataFileIDs;
+            this.inputCheckedDataFiles = json.info.inputDataFileIDs;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
             const { firstname, lastname, dataset_title, DOI } = json.info;
@@ -167,6 +181,7 @@ export class AuthStore {
           .post(API_URL.SAVERESPONSES, {
             token: this.token,
             responses: values,
+            checkedDataFiles: this.checkedDataFiles,
           })
           .then(
             action((json) => {
@@ -201,23 +216,30 @@ export class AuthStore {
     //   });
     // }, 2000);
   }
-  onChange = (list: any) => {
+  @action onChange = (list: any) => {
     this.checkedDataFiles = list;
     this.indeterminate = !!list.length && list.length < this.dataFiles.length;
     this.checkall = list.length === this.dataFiles.length;
   };
-  onCheckAllChange = (e: any) => {
-    this.checkedDataFiles = e.target.checked
-      ? this.dataFiles.map((d) => d.label)
-      : [];
+  @action onCheckAllChange = (e: any) => {
+    this.checkedDataFiles = this.sortChcked(e.target.checked);
     this.indeterminate = false;
     this.checkall = e.target.checked;
+  };
+  sortChcked = (checked: boolean) => {
+    var checkedFiles: Array<number> = [...this.inputCheckedDataFiles];
+    if (checked) {
+      this.dataFiles.map((d: dataFiles) => {
+        if (!d.disabled) checkedFiles.push(d.id);
+      });
+    } else checkedFiles = [...this.inputCheckedDataFiles];
+    return checkedFiles;
   };
   resultModal = (type: string) => {
     Modal.success({
       title:
         type === "save"
-          ? `Your answers have been saved, a confirmation email has been sent to your registed email address.`
+          ? `Your answers have been saved, a confirmation email has been sent to your registered email address.`
           : `Your answers have been submitted.`,
     });
   };

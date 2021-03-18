@@ -78,7 +78,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
                   <RequestAccessQuestion question={q} key={index} />
                 )
             )}
-          {authStore?.dataFiles && <DataFile />}
+          {!authStore?.submitted && authStore?.dataFiles && <DataFile />}
         </Form>
       </div>
     );
