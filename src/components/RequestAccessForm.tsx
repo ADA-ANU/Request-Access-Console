@@ -15,7 +15,7 @@ import {
   Col,
   Input,
   message,
-  notification,
+  Skeleton,
 } from "antd";
 const { TextArea } = Input;
 import API_URL from "../config";

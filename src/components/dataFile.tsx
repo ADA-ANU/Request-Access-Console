@@ -36,27 +36,47 @@ interface DataFileProps {
 export default class DataFile extends React.Component<DataFileProps> {
   render() {
     const { authStore } = this.props;
-    console.log(authStore?.checkedDataFiles);
+    //console.log(authStore?.submitted);
 
     return (
       <>
         <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-          <Title level={4}>Request access for files in the same dataset</Title>
+          <Title level={4}>Request access to files in the same dataset</Title>
         </div>
-        <div style={{ paddingTop: "4vh" }}>
+        <div
+          style={{
+            paddingTop: "4vh",
+            //display: "block",
+            marginRight: 10,
+          }}
+        >
           <Checkbox
+            style={{ display: "block", marginLeft: 0 }}
             indeterminate={authStore?.indeterminate}
             onChange={authStore?.onCheckAllChange}
             checked={authStore?.checkall}
+            disabled={authStore?.submitted}
           >
             Check all
           </Checkbox>
           <Divider />
           <CheckboxGroup
-            options={authStore?.dataFiles}
+            //options={authStore?.dataFiles}
             value={authStore?.checkedDataFiles}
             onChange={authStore?.onChange}
-          />
+          >
+            {authStore?.dataFiles.map((file) => {
+              //console.log(authStore?.checkedDataFiles);
+              //console.log(authStore?.checkedDataFiles.includes(file.id));
+              return (
+                <Row key={file.id}>
+                  <Checkbox value={file.id} disabled={file.disabled}>
+                    {file.label}
+                  </Checkbox>
+                </Row>
+              );
+            })}
+          </CheckboxGroup>
         </div>
       </>
     );

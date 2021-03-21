@@ -1,6 +1,6 @@
 let API_ROOT_URL = "http://localhost:3080";
 let WS_URL = `ws://localhost:9060`;
-console.log(process.env);
+//console.log(process.env);
 
 process.env.NODE_ENV === "production" ? (API_ROOT_URL = "") : "";
 process.env.NODE_ENV === "production"

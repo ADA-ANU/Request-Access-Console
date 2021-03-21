@@ -74,10 +74,10 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json.guestbook);
-            console.log(json.responseValues);
-            console.log(json.info, json.submitted);
-            console.log(json.dataFiles);
+            // console.log(json.guestbook);
+            // console.log(json.responseValues);
+            // console.log(json.info, json.submitted);
+            // console.log(json.dataFiles);
             const dfs = json.dataFiles.map((d: any) => {
               d["value"] = d.id;
               if (d.assigneeidentifier || d.authenticated_user_id)
@@ -89,8 +89,8 @@ export class AuthStore {
               return d;
             });
             //console.log(dfs);
-            this.dataFiles = dfs;
             this.checkedDataFiles = json.info.inputDataFileIDs;
+            this.dataFiles = dfs;
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
@@ -217,9 +217,32 @@ export class AuthStore {
     // }, 2000);
   }
   @action onChange = (list: any) => {
+    console.log(list);
     this.checkedDataFiles = list;
     this.indeterminate = !!list.length && list.length < this.dataFiles.length;
     this.checkall = list.length === this.dataFiles.length;
+  };
+  @action individualOnChange = (e: any, fileID: number) => {
+    console.log(e, fileID);
+    if (e.target.checked) {
+      if (!this.checkedDataFiles.includes(fileID)) {
+        const checkedList = [...this.checkedDataFiles, fileID];
+        console.log(checkedList);
+        this.checkedDataFiles = checkedList;
+        this.indeterminate =
+          !!checkedList.length && checkedList.length < this.dataFiles.length;
+        this.checkall = checkedList.length === this.dataFiles.length;
+      }
+    } else {
+      const checkedList = [
+        ...this.checkedDataFiles.filter((item) => item !== fileID),
+      ];
+      console.log(checkedList);
+      this.checkedDataFiles = checkedList;
+      this.indeterminate =
+        !!checkedList.length && checkedList.length < this.dataFiles.length;
+      this.checkall = checkedList.length === this.dataFiles.length;
+    }
   };
   @action onCheckAllChange = (e: any) => {
     this.checkedDataFiles = this.sortChcked(e.target.checked);
