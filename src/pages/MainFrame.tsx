@@ -17,7 +17,7 @@ import {
   Badge,
   Tooltip,
   Affix,
-  Avatar,
+  Modal,
   Skeleton,
   Button,
   Col,
@@ -206,12 +206,12 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                           <Button
                             form="requestAccess"
                             key="submit"
-                            htmlType="submit"
+                            //htmlType="submit"
                             type="primary"
                             icon={<PoweroffOutlined />}
                             loading={authStore.submitting}
                             disabled={authStore.submitted}
-                            //onClick={() => authStore.submit()}
+                            onClick={() => authStore.confirmModal()}
                           >
                             Submit!
                           </Button>
@@ -301,6 +301,33 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             © {new Date().getFullYear()} Australian Data Archive (Australian
             National University) | All Rights Reserved.
           </Row>
+          <Modal
+            visible={authStore.showModal}
+            title="Title"
+            closable={false}
+            maskClosable={false}
+            onOk={() => authStore.handleModal(false)}
+            onCancel={() => authStore.handleModal(false)}
+            footer={[
+              <Button key="back" onClick={() => authStore.handleModal(false)}>
+                Return
+              </Button>,
+              <Button
+                key="submit"
+                type="primary"
+                loading={authStore.submitting}
+                onClick={() => authStore.handleModal(false)}
+              >
+                Submit
+              </Button>,
+            ]}
+          >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Modal>
         </Footer>
       </Layout>
     );

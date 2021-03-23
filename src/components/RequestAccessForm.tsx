@@ -60,6 +60,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
 
   render() {
     const { authStore } = this.props;
+    console.log(authStore?.showModal);
     return (
       <div style={{ margin: "auto", width: "50%", paddingTop: "3vh" }}>
         <Form

@@ -37,6 +37,9 @@ export class AuthStore {
   @observable inputCheckedDataFiles: Array<number> = [];
   @observable checkall: boolean = false;
   @observable indeterminate: boolean = true;
+  @observable termsOfAccess: string | undefined;
+  @observable termsOfUse: string | undefined;
+  @observable showModal: boolean = false;
   constructor() {
     this.initApp();
   }
@@ -77,7 +80,7 @@ export class AuthStore {
             // console.log(json.guestbook);
             // console.log(json.responseValues);
             // console.log(json.info, json.submitted);
-            // console.log(json.dataFiles);
+            //console.log(json.terms);
             const dfs = json.dataFiles.map((d: any) => {
               d["value"] = d.id;
               if (d.assigneeidentifier || d.authenticated_user_id)
@@ -89,6 +92,9 @@ export class AuthStore {
               return d;
             });
             //console.log(dfs);
+            const { termsofaccess, termsofuse } = json.terms[0];
+            this.termsOfAccess = termsofaccess;
+            this.termsOfUse = termsofuse;
             this.checkedDataFiles = json.info.inputDataFileIDs;
             this.dataFiles = dfs;
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
@@ -135,7 +141,17 @@ export class AuthStore {
     this.authenticated = false;
     this.errorMsg = value;
   }
-
+  @action confirmModal() {
+    this.formRef.current
+      ?.validateFields()
+      .then((values) => {
+        this.showModal = true;
+      })
+      .catch((err) => {});
+  }
+  @action handleModal(value: boolean) {
+    this.showModal = value;
+  }
   @action submit(values: object) {
     this.submitting = true;
     console.log(values);
