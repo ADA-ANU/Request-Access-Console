@@ -38,7 +38,7 @@ export class AuthStore {
   @observable checkall: boolean = false;
   @observable indeterminate: boolean = true;
   @observable termsOfAccess: string | undefined;
-  @observable termsOfUse: string | undefined;
+  @observable termsOfUse: string = "";
   @observable showModal: boolean = false;
   constructor() {
     this.initApp();

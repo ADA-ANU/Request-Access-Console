@@ -21,7 +21,7 @@ import {
   Skeleton,
   Button,
   Col,
-  Dropdown,
+  Card,
 } from "antd";
 import { SystemStore } from "../stores/systemStore";
 import { IRoutingProps } from "../props.d";
@@ -30,7 +30,8 @@ import authStore, { AuthStore } from "../stores/authStore";
 //import PrinterConfig from './PrinterConfig';
 import { UserOutlined, KeyOutlined, PoweroffOutlined } from "@ant-design/icons";
 import RequestAccessForm from "../components/RequestAccessForm";
-const { Title, Text } = Typography;
+import Parser from "html-react-parser";
+const { Title, Text, Paragraph } = Typography;
 const { Header, Content, Footer } = Layout;
 
 export interface IMainFrameProps extends IRoutingProps {
@@ -303,7 +304,8 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
           </Row>
           <Modal
             visible={authStore.showModal}
-            title="Title"
+            //title="Terms and Conditions"
+            width="60%"
             closable={false}
             maskClosable={false}
             onOk={() => authStore.handleModal(false)}
@@ -322,11 +324,34 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
               </Button>,
             ]}
           >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
+            <p style={{ textAlign: "center", fontWeight: "bold" }}>
+              Terms and Conditions
+            </p>
+            <hr />
+            <Row
+              style={{
+                paddingTop: "2vh",
+                minHeight: "30vh",
+              }}
+            >
+              <Col span={10} offset={1}>
+                <p style={{ textAlign: "center" }}>Terms of Access</p>
+                {authStore.termsOfAccess}
+              </Col>
+              <Col
+                span={10}
+                offset={2}
+                style={{ maxHeight: "50vh", overflow: "auto" }}
+              >
+                <p style={{ textAlign: "center" }}>Terms of Use</p>
+                {
+                  Parser(authStore.termsOfUse!)
+                  // <div
+                  //   dangerouslySetInnerHTML={{ __html: authStore.termsOfUse! }}
+                  // />
+                }
+              </Col>
+            </Row>
           </Modal>
         </Footer>
       </Layout>

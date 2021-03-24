@@ -23,6 +23,7 @@
     "customize-cra": "^0.2.13",
     "file-saver": "^2.0.2",
     "history": "^4.10.1",
+    "html-react-parser": "^1.2.4",
     "jszip": "^3.2.2",
     "less": "^3.10.3ya",
     "less-loader": "^5.0.0",
