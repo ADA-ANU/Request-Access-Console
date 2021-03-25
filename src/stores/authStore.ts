@@ -9,7 +9,10 @@ import { setWsHeartbeat } from "ws-heartbeat/client";
 import routingStore from "./routingStore";
 import moment from "moment";
 import { FormInstance } from "antd/lib/form";
-import { convertCompilerOptionsFromJson } from "typescript";
+import {
+  convertCompilerOptionsFromJson,
+  textChangeRangeIsUnchanged,
+} from "typescript";
 import { ResultType, dataFiles } from "../stores/data.d";
 
 export class AuthStore {
@@ -40,6 +43,11 @@ export class AuthStore {
   @observable termsOfAccess: string | undefined;
   @observable termsOfUse: string = "";
   @observable showModal: boolean = false;
+  @observable termsCheckboxes: Array<string> = [
+    "I accept the Terms of Access.",
+    "I accept the Terms of Use.",
+  ];
+  @observable termsCheckboxValues: Array<string> = [];
   constructor() {
     this.initApp();
   }
@@ -151,10 +159,22 @@ export class AuthStore {
   }
   @action handleModal(value: boolean) {
     this.showModal = value;
+    if (!value) this.termsCheckboxValues = [];
   }
   @action submit(values: object) {
     this.submitting = true;
     console.log(values);
+    //this.handleModal(false);
+    if (
+      this.termsCheckboxValues.sort().join(",") !==
+      this.termsCheckboxes.sort().join(",")
+    ) {
+      this.openNotification(
+        "Please tick the checkboxes of terms before the submission."
+      );
+      this.submitting = false;
+      return;
+    }
     apiagent
       .post(API_URL.SUBMITRESPONSES, {
         token: this.token,
@@ -179,6 +199,7 @@ export class AuthStore {
       })
       .finally(
         action(() => {
+          this.handleModal(false);
           setTimeout(() => (this.submitting = false), 1000);
         })
       );
@@ -264,6 +285,10 @@ export class AuthStore {
     this.checkedDataFiles = this.sortChcked(e.target.checked);
     this.indeterminate = false;
     this.checkall = e.target.checked;
+  };
+  @action termsOnchange = (list: any) => {
+    console.log(list);
+    this.termsCheckboxValues = list;
   };
   sortChcked = (checked: boolean) => {
     var checkedFiles: Array<number> = [...this.inputCheckedDataFiles];

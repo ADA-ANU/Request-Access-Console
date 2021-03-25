@@ -21,7 +21,7 @@ import {
   Skeleton,
   Button,
   Col,
-  Card,
+  Checkbox,
 } from "antd";
 import { SystemStore } from "../stores/systemStore";
 import { IRoutingProps } from "../props.d";
@@ -33,6 +33,7 @@ import RequestAccessForm from "../components/RequestAccessForm";
 import Parser from "html-react-parser";
 const { Title, Text, Paragraph } = Typography;
 const { Header, Content, Footer } = Layout;
+const CheckboxGroup = Checkbox.Group;
 
 export interface IMainFrameProps extends IRoutingProps {
   systemStore?: SystemStore;
@@ -310,21 +311,15 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             maskClosable={false}
             onOk={() => authStore.handleModal(false)}
             onCancel={() => authStore.handleModal(false)}
-            footer={[
-              <Button key="back" onClick={() => authStore.handleModal(false)}>
-                Return
-              </Button>,
-              <Button
-                key="submit"
-                type="primary"
-                loading={authStore.submitting}
-                onClick={() => authStore.handleModal(false)}
-              >
-                Submit
-              </Button>,
-            ]}
+            footer={null}
           >
-            <p style={{ textAlign: "center", fontWeight: "bold" }}>
+            <p
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                fontSize: "150%",
+              }}
+            >
               Terms and Conditions
             </p>
             <hr />
@@ -335,21 +330,78 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
               }}
             >
               <Col span={10} offset={1}>
-                <p style={{ textAlign: "center" }}>Terms of Access</p>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "120%",
+                  }}
+                >
+                  Terms of Access
+                </p>
                 {authStore.termsOfAccess}
               </Col>
-              <Col
-                span={10}
-                offset={2}
-                style={{ maxHeight: "50vh", overflow: "auto" }}
-              >
-                <p style={{ textAlign: "center" }}>Terms of Use</p>
-                {
-                  Parser(authStore.termsOfUse!)
-                  // <div
-                  //   dangerouslySetInnerHTML={{ __html: authStore.termsOfUse! }}
-                  // />
-                }
+              <Col span={10} offset={2}>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "120%",
+                  }}
+                >
+                  Terms of Use
+                </p>
+                <div style={{ maxHeight: "40vh", overflow: "auto" }}>
+                  {
+                    Parser(authStore.termsOfUse!)
+                    // <div
+                    //   dangerouslySetInnerHTML={{ __html: authStore.termsOfUse! }}
+                    // />
+                  }
+                </div>
+              </Col>
+            </Row>
+
+            <Row style={{ paddingTop: "5vh" }}>
+              <Col span={10} offset={1}>
+                <CheckboxGroup
+                  value={authStore?.termsCheckboxValues}
+                  onChange={authStore?.termsOnchange}
+                >
+                  {authStore.termsCheckboxes.map((term, index) => (
+                    <Row key={index}>
+                      <Checkbox value={term}>{term}</Checkbox>
+                    </Row>
+                  ))}
+                </CheckboxGroup>
+              </Col>
+            </Row>
+            <div style={{ paddingTop: "3vh" }}>
+              <hr />
+            </div>
+
+            <Row justify="center" style={{ paddingTop: "2vh" }}>
+              <Col>
+                <Button key="back" onClick={() => authStore.handleModal(false)}>
+                  Return
+                </Button>
+              </Col>
+              <Col offset={1}>
+                <Button
+                  form="requestAccess"
+                  key="submit"
+                  htmlType="submit"
+                  type="primary"
+                  loading={authStore.submitting}
+                  //onClick={() => authStore.handleModal(false)}
+                  disabled={
+                    authStore.termsCheckboxValues.length !== 2 ||
+                    authStore.termsCheckboxValues.sort().join(",") !==
+                      authStore.termsCheckboxes.sort().join(",")
+                  }
+                >
+                  Request Access
+                </Button>
               </Col>
             </Row>
           </Modal>

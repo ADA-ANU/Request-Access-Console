@@ -54,7 +54,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
     //this.props.form.resetFields();
   };
   handleSubmit = (values: any) => {
-    //console.log("Received values of form: ", values);
+    console.log("Received values of form: ", values);
     this.props.authStore?.submit(values);
   };
 
