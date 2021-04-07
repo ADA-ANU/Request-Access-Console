@@ -117,7 +117,7 @@ export class AuthStore {
           })
         )
         .catch((error) => {
-          console.log(error);
+          console.log(error.status);
           if (error.status === 401) {
             // this.authenticated = false;
             // this.errorMsg =
@@ -126,7 +126,13 @@ export class AuthStore {
               "Session expired, please proceed to Dataverse to start over again."
             );
             //alert(error.data);
+          } else if (error.status === 405) {
+            console.log("6666");
+            this.unauthorised(
+              "Email unconfirmed, please proceed to Dataverse to confirm your email."
+            );
           } else {
+            console.log("777");
             this.unauthorised(
               error.data ? error.data : "Server error, please try again."
             );
