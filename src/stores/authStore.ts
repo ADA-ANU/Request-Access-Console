@@ -13,7 +13,7 @@ import {
   convertCompilerOptionsFromJson,
   textChangeRangeIsUnchanged,
 } from "typescript";
-import { ResultType, dataFiles } from "../stores/data.d";
+import { ResultType, dataFiles, submissionResult } from "../stores/data.d";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -43,11 +43,13 @@ export class AuthStore {
   @observable termsOfAccess: string | undefined;
   @observable termsOfUse: string = "";
   @observable showModal: boolean = false;
+  @observable showResultModal: boolean = false;
   @observable termsCheckboxes: Array<string> = [
     "I accept the Terms of Access.",
     "I accept the Terms of Use.",
   ];
   @observable termsCheckboxValues: Array<string> = [];
+  @observable submissionResult: Array<submissionResult> = [];
   constructor() {
     this.initApp();
   }
@@ -167,6 +169,9 @@ export class AuthStore {
     this.showModal = value;
     if (!value) this.termsCheckboxValues = [];
   }
+  @action handleResultModal(value: boolean) {
+    this.showResultModal = value;
+  }
   @action submit(values: object) {
     this.submitting = true;
     console.log(values);
@@ -190,7 +195,9 @@ export class AuthStore {
         action((json) => {
           console.log(json);
           this.submitted = true;
-          this.resultModal("submit");
+          this.showResultModal = true;
+          this.submissionResult = json;
+          //this.resultModal("submit");
         })
       )
       .catch((error) => {
@@ -310,7 +317,7 @@ export class AuthStore {
       title:
         type === "save"
           ? `Your answers have been saved, a confirmation email has been sent to your registered email address.`
-          : `Your answers have been submitted.`,
+          : `Submission Result: `,
     });
   };
   openNotification = (msg: string) => {

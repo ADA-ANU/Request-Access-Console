@@ -21,6 +21,12 @@ export interface RequestAccessQ {
   guestbookid: number;
 }
 
+export interface submissionResult {
+  datafileID: number;
+  status: string;
+  msg: string;
+}
+
 export interface dataFiles {
   id: number;
   label: string;

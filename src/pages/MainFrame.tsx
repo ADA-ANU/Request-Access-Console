@@ -28,7 +28,13 @@ import { IRoutingProps } from "../props.d";
 import UserProfile from "./UserProfile";
 import authStore, { AuthStore } from "../stores/authStore";
 //import PrinterConfig from './PrinterConfig';
-import { UserOutlined, KeyOutlined, PoweroffOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  KeyOutlined,
+  PoweroffOutlined,
+  ExclamationCircleOutlined,
+  CheckCircleTwoTone,
+} from "@ant-design/icons";
 import RequestAccessForm from "../components/RequestAccessForm";
 import Parser from "html-react-parser";
 const { Title, Text, Paragraph } = Typography;
@@ -403,6 +409,67 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   Request Access
                 </Button>
               </Col>
+            </Row>
+          </Modal>
+          <Modal
+            title={
+              authStore.submissionResult.some(
+                (ele) => ele.status === "ERROR"
+              ) ? (
+                <Row>
+                  <Col span={2} offset={1}>
+                    <ExclamationCircleOutlined
+                      style={{ fontSize: "23px", color: "#faad14" }}
+                    />
+                  </Col>
+                  <Col span={16} offset={0}>
+                    <span>One or more requests failed</span>
+                  </Col>
+                </Row>
+              ) : (
+                <Row>
+                  <Col span={2} offset={1}>
+                    <CheckCircleTwoTone
+                      twoToneColor="#52c41a"
+                      style={{ fontSize: "23px" }}
+                    />
+                  </Col>
+                  <Col span={8} offset={0}>
+                    <span>Requests submitted</span>
+                  </Col>
+                </Row>
+              )
+            }
+            closable={false}
+            maskClosable={false}
+            visible={authStore.showResultModal}
+            onOk={() => authStore.handleResultModal(false)}
+            onCancel={() => authStore.handleResultModal(false)}
+            footer={null}
+          >
+            {authStore.submissionResult &&
+            authStore.submissionResult.length > 0 ? (
+              <ol>
+                {authStore.submissionResult.map((result) => (
+                  <li
+                    style={{
+                      color: result.status === "ERROR" ? "#ff4d4f" : "black",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {result.msg}
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+            <Row justify="center" style={{ paddingTop: "4vh" }}>
+              <Button
+                key="OK"
+                type="primary"
+                onClick={() => authStore.handleResultModal(false)}
+              >
+                OK
+              </Button>
             </Row>
           </Modal>
         </Footer>
