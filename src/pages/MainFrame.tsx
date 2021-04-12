@@ -450,8 +450,9 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             {authStore.submissionResult &&
             authStore.submissionResult.length > 0 ? (
               <ol>
-                {authStore.submissionResult.map((result) => (
+                {authStore.submissionResult.map((result, index) => (
                   <li
+                    key={index}
                     style={{
                       color: result.status === "ERROR" ? "#ff4d4f" : "black",
                       fontSize: "16px",
