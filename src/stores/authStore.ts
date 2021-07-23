@@ -76,7 +76,7 @@ export class AuthStore {
     //     couponStore.getCouponRule(this.adminAccount.companyId)
     // }
   }
-  @action download(file: uploadFile) {}
+
   @action init(token: string | undefined) {
     if (token) {
       this.token = token;
