@@ -19,8 +19,14 @@ export interface RequestAccessQ {
   options: Array;
   questionid: number;
   guestbookid: number;
+  files: uploadFile[];
 }
 
+export interface uploadFile {
+  id: number;
+  filename: string;
+  originalname: string;
+}
 export interface submissionResult {
   datafileID: number;
   status: string;

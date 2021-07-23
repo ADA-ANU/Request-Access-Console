@@ -44,9 +44,9 @@ export default class UserProfile extends React.Component<UserProfileProps> {
               column={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 6 }}
             >
               <Descriptions.Item label="Restaurent Top Band" span={24}>
-                <img
+                {/* <img
                   src={`${API_URL.ROOT_URL}${API_URL.IMAGE}/${restaurantInfo.backgroundImg}`}
-                ></img>
+                ></img> */}
               </Descriptions.Item>
               <Descriptions.Item label="Name">
                 {restaurantInfo.name}
@@ -55,9 +55,9 @@ export default class UserProfile extends React.Component<UserProfileProps> {
                 {restaurantInfo.type}
               </Descriptions.Item>
               <Descriptions.Item label="Logo">
-                <img
+                {/* <img
                   src={`${API_URL.ROOT_URL}${API_URL.IMAGE}/${restaurantInfo.logo}`}
-                ></img>{" "}
+                ></img>{" "} */}
               </Descriptions.Item>
 
               <Descriptions.Item label="Phone">

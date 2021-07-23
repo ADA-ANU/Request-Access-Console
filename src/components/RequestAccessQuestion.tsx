@@ -31,6 +31,7 @@ import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 import Options from "./options";
 import Text from "./text";
+import FileUpload from "./fileUpload";
 const { Option } = Select;
 const { TextArea } = Input;
 // interface ReturnFileType{
@@ -56,10 +57,17 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
   render() {
     const { authStore, question } = this.props;
     //console.log(authStore);
-    return question && question.questiontype === "options" ? (
-      <Options question={question} />
-    ) : (
-      <Text question={question} />
-    );
+    const returnQuestion = (question: RequestAccessQ) => {
+      const type = question.questiontype;
+      if (type === "options") return <Options question={question} />;
+      else if (type === "fileupload") return <FileUpload question={question} />;
+      else return <Text question={question} />;
+    };
+    return question && returnQuestion(question);
+    // question.questiontype === "options" ? (
+    //   <Options question={question} />
+    // ) : (
+    //   <Text question={question} />
+    // );
   }
 }

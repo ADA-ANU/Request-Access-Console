@@ -4,7 +4,7 @@ import { Modal, notification } from "antd";
 import API_URL from "../config";
 import apiagent from "./apiagent";
 import systemStore from "./systemStore";
-import { AdminType, RestaurantType, RequestAccessQ } from "./data";
+import { AdminType, RestaurantType, RequestAccessQ, uploadFile } from "./data";
 import { setWsHeartbeat } from "ws-heartbeat/client";
 import routingStore from "./routingStore";
 import moment from "moment";
@@ -76,7 +76,7 @@ export class AuthStore {
     //     couponStore.getCouponRule(this.adminAccount.companyId)
     // }
   }
-
+  @action download(file: uploadFile) {}
   @action init(token: string | undefined) {
     if (token) {
       this.token = token;

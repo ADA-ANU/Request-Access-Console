@@ -66,7 +66,7 @@ export default class DataFile extends React.Component<DataFileProps> {
             onChange={authStore?.onChange}
           >
             {authStore?.dataFiles.map((file) => {
-              //console.log(authStore?.checkedDataFiles);
+              console.log(file);
               //console.log(authStore?.checkedDataFiles.includes(file.id));
               return (
                 <Row key={file.id}>
