@@ -92,7 +92,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
           },
         ]}
       >
-        {question.files && question.files.length > 0 && (
+        {question.files && question.files.length > 0 && question.files[0].id && (
           <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
             {question.files.map((file: uploadFile) => (
               <FileDownload file={file} />
