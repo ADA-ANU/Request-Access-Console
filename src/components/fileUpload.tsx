@@ -82,8 +82,8 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
     };
     return (
       <Form.Item
-        key={question.displayorder}
-        name={question.questionid}
+        // key={question.displayorder}
+        // name={question.questionid}
         label={question.questionstring}
         rules={[
           {
@@ -92,24 +92,26 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
           },
         ]}
       >
-        {question.files && question.files.length > 0 && question.files[0].id && (
+        {question.files && question.files[0] && question.files[0].id && (
           <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
             {question.files.map((file: uploadFile) => (
-              <FileDownload file={file} />
+              <FileDownload file={file} key={file.id} />
             ))}
           </Row>
         )}
-        <div style={{ marginTop: "4vh" }}>
-          <Dragger {...props}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag files to this area to upload
-            </p>
-            <p className="ant-upload-hint"></p>
-          </Dragger>
-        </div>
+        <Form.Item name="fileUpload">
+          <div style={{ marginTop: "4vh" }}>
+            <Dragger {...props}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag files to this area to upload
+              </p>
+              <p className="ant-upload-hint"></p>
+            </Dragger>
+          </div>
+        </Form.Item>
       </Form.Item>
     );
   }

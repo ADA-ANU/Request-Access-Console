@@ -87,7 +87,7 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            // console.log(json.guestbook);
+            console.log(json.dataFiles);
             // console.log(json.responseValues);
             // console.log(json.info, json.submitted);
             //console.log(json.terms);
