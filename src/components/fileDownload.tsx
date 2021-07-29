@@ -43,61 +43,77 @@ interface RequestAccessFileDownloadProps {
 @inject("authStore")
 @observer
 export default class FileUpload extends React.Component<RequestAccessFileDownloadProps> {
+  fileOnDownload = (filename: string) => {
+    apiagent
+      .get(`${API_URL.HANDLE_FILE_DOWNLOAD}${filename}`)
+      .catch((error) => {
+        console.log(error);
+        error.status === 404
+          ? this.openNotification("File Not Found.")
+          : this.openNotification(error.data);
+        //this.openNotification(error.data);
+      });
+  };
+
+  openNotification = (msg: string) => {
+    notification.error({
+      message: `Oops`,
+      description: msg,
+    });
+  };
   render() {
     const { file } = this.props;
     //console.log(authStore);
-    const url = `http://localhost:3000/api/download/${file.filename}`;
+    //const url = `http://localhost:3000/api/download/${file.filename}`;
     return (
       <Col span={8}>
-        <a href={url}>
-          <Card
-            hoverable
-            bodyStyle={{ padding: "0" }}
-            onClick={() => {
-              console.log(file.originalname);
+        {/* <a href={url}> */}
+        <Card
+          hoverable
+          bodyStyle={{ padding: "0" }}
+          onClick={() => this.fileOnDownload(file.filename)}
+        >
+          <div
+            style={{
+              textAlign: "left",
+              width: "100%",
+              backgroundColor: "#fff",
+              userSelect: "none",
+              color: "#333",
+              fontWeight: 300,
+              minHeight: "50px",
             }}
           >
-            <div
-              style={{
-                textAlign: "left",
-                width: "100%",
-                backgroundColor: "#fff",
-                userSelect: "none",
-                color: "#333",
-                fontWeight: 300,
-                minHeight: "50px",
-              }}
-            >
-              <Row align="middle">
-                <Col
-                  style={{ fontSize: 30, color: "#158526" }}
-                  lg={{ span: 4, offset: 1 }}
-                  xl={{ span: 4, offset: 1 }}
-                  xxl={{ span: 3, offset: 1 }}
-                >
-                  <FileZipOutlined />
-                </Col>
-                <Col
-                  lg={{ span: 4, offset: 1 }}
-                  xl={{ span: 4, offset: 1 }}
-                  xxl={{ span: 15, offset: 1 }}
-                >
-                  <p style={{ margin: 0, overflowWrap: "break-word" }}>
-                    {file.originalname}
-                  </p>
-                </Col>
-                <Col
-                  style={{ fontSize: 20, color: "#158526" }}
-                  lg={{ span: 4, offset: 1 }}
-                  xl={{ span: 4, offset: 1 }}
-                  xxl={{ span: 1, offset: 1 }}
-                >
-                  <DownloadOutlined />
-                </Col>
-              </Row>
-            </div>
-          </Card>
-        </a>
+            <Row align="middle">
+              <Col
+                style={{ fontSize: 30, color: "#158526" }}
+                lg={{ span: 4, offset: 1 }}
+                xl={{ span: 4, offset: 1 }}
+                xxl={{ span: 3, offset: 1 }}
+              >
+                <FileZipOutlined />
+              </Col>
+              <Col
+                lg={{ span: 4, offset: 1 }}
+                xl={{ span: 4, offset: 1 }}
+                xxl={{ span: 15, offset: 1 }}
+              >
+                <p style={{ margin: 0, overflowWrap: "break-word" }}>
+                  {file.originalname}
+                </p>
+              </Col>
+              <Col
+                style={{ fontSize: 20, color: "#158526" }}
+                lg={{ span: 4, offset: 1 }}
+                xl={{ span: 4, offset: 1 }}
+                xxl={{ span: 1, offset: 1 }}
+              >
+                <DownloadOutlined />
+              </Col>
+            </Row>
+          </div>
+        </Card>
+        {/* </a> */}
       </Col>
     );
   }

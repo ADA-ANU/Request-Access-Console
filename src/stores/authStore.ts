@@ -14,6 +14,7 @@ import {
   textChangeRangeIsUnchanged,
 } from "typescript";
 import { ResultType, dataFiles, submissionResult } from "../stores/data.d";
+import { file } from "jszip";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -23,6 +24,7 @@ export class AuthStore {
   @observable submitted: boolean = false;
   @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
+  @observable userid: number | undefined;
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
@@ -110,9 +112,12 @@ export class AuthStore {
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
-            const { firstname, lastname, dataset_title, DOI } = json.info;
+            const { firstname, lastname, dataset_title, DOI, userid } =
+              json.info;
             this.userFirstName = firstname;
             this.userLastName = lastname;
+            //console.log(userid);
+            this.userid = userid;
             this.datasetTitle = dataset_title;
             this.doi = DOI;
             this.submitted = json.submitted;
@@ -303,6 +308,7 @@ export class AuthStore {
     console.log(list);
     this.termsCheckboxValues = list;
   };
+
   sortChcked = (checked: boolean) => {
     var checkedFiles: Array<number> = [...this.inputCheckedDataFiles];
     if (checked) {

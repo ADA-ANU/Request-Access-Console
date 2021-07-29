@@ -21,7 +21,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
 import { RequestAccessQ, uploadFile } from "../stores/data.d";
 import { RouteComponentProps } from "react-router-dom";
-import { UploadFile, UploadListType } from "antd/lib/upload/interface";
+import { RcFile, UploadFile, UploadListType } from "antd/lib/upload/interface";
 import systemStore from "../stores/systemStore";
 import { action, toJS } from "mobx";
 import { NotificationPlacement } from "antd/lib/notification";
@@ -52,8 +52,8 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       name: "file",
       multiple: true,
       listType: "text" as "picture" | "text" | "picture-card" | undefined,
-      //data: { qID: value.qid },
-      action: `http://localhost:3080/${API_URL.HANDLE_FILE_UPDATE}`,
+      data: { qID: question.questionid, userid: authStore?.userid },
+      action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
       //this.handleUploadedFiles(value.files)
       defaultFileList: [],
       // value.files[0].id
@@ -63,7 +63,16 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         showDownloadIcon: false,
         //downloadIcon: "download ",
         showRemoveIcon: true,
-        removeIcon: <DeleteOutlined onClick={() => console.log("deleted")} />,
+        removeIcon: <DeleteOutlined />,
+      },
+      beforeUpload(file: RcFile, fileList: RcFile[]) {
+        console.log(file, fileList);
+        console.log(fileList[0].uid === file.uid);
+        // const temp = fileList.pop().map()
+        // const preList = temp?.map(ele=>ele.name)
+        // console.log(preList);
+        // if (preList?.includes(file.name)) return Upload.LIST_IGNORE;
+        // else return true;
       },
       onChange(info: any) {
         const { status } = info.file;
@@ -78,6 +87,10 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       },
       onDrop(e: any) {
         console.log("Dropped files", e.dataTransfer.files);
+      },
+      onRemove(file: UploadFile<any>) {
+        console.log(file);
+        //authStore?.handleFileOnRemove(file);
       },
     };
     return (

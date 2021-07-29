@@ -13,6 +13,7 @@ const API_URL = {
   SAVERESPONSES: "api/saveResponses",
   SUBMITRESPONSES: "api/submitResponses",
   HANDLE_FILE_UPDATE: "api/handleFileUpload",
+  HANDLE_FILE_DOWNLOAD: "api/download/",
   DEFAULT_PRINT_SERVICE: "http://localhost:9099",
   PRINTER_STATUS: `http://localhost:9099/printerStatus`,
   SITE: "/api/site",
