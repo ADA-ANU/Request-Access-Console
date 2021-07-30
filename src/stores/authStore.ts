@@ -15,6 +15,7 @@ import {
 } from "typescript";
 import { ResultType, dataFiles, submissionResult } from "../stores/data.d";
 import { file } from "jszip";
+import { RcFile } from "antd/lib/upload";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -28,6 +29,7 @@ export class AuthStore {
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
+  @observable uploadedFiles: Array<string> = [];
   @observable doi: string | undefined;
   @observable dataFiles: Array<dataFiles> = [];
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
@@ -156,6 +158,28 @@ export class AuthStore {
           })
         );
     }
+  }
+  @action addFileName(name: string) {
+    this.uploadedFiles.push(name);
+  }
+  @action deleteFile(file: any) {
+    console.log(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`);
+    apiagent
+      .get(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`)
+      .then(
+        action((json) => {
+          console.log(json);
+          const temp = [...this.uploadedFiles].filter(
+            (ele) => ele !== file.name
+          );
+          this.uploadedFiles = temp;
+        })
+      )
+      .catch((error) => {
+        console.log(error);
+
+        this.openNotification(error.data);
+      });
   }
 
   @action unauthorised(value: string) {
@@ -330,6 +354,11 @@ export class AuthStore {
     notification.error({
       message: `Oops`,
       description: msg,
+    });
+  };
+  openNotificationSuccessful = (msg: string) => {
+    notification.success({
+      message: msg,
     });
   };
 }

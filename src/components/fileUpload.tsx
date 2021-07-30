@@ -30,6 +30,7 @@ import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import FileDownload from "./fileDownload";
+import { FULFILLED } from "mobx-utils";
 const { Option } = Select;
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -44,16 +45,72 @@ interface RequestAccessFileUploadProps {
 @inject("authStore")
 @observer
 export default class FileUpload extends React.Component<RequestAccessFileUploadProps> {
+  state = {
+    files: [],
+    defaultFileList: [],
+    progress: 0,
+  };
+  setProgress = (progress: number) => {
+    this.setState({ progress: progress });
+  };
+
+  fileUpload = (options: any) => {
+    const { onSuccess, onError, file, onProgress } = options;
+    const { question, authStore } = this.props;
+    console.log(file);
+    const fmData = new FormData();
+    const config = {
+      headers: { "content-type": "multipart/form-data" },
+      onUploadProgress: (event: any) => {
+        onProgress({ percent: (event.loaded / event.total) * 100 });
+      },
+    };
+    fmData.append("qID", question.questionid.toString());
+    fmData.append("userid", authStore?.userid!.toString() as string);
+    fmData.append("file", file);
+    apiagent
+      .post(`${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`, fmData, config)
+      .then((dd) => {
+        console.log(dd);
+        file.fileName = dd;
+        onSuccess(null, file);
+      })
+      .catch((e) => {
+        console.log(e);
+        onError({ e });
+      });
+  };
+
+  onChange = (info: any) => {
+    const { status } = info.file;
+    if (status !== "uploading") {
+      //console.log(info.file, info.fileList);
+    }
+    if (status === "done") {
+      this.props.authStore?.openNotificationSuccessful(
+        `${info.file.name} successfully uploaded.`
+      );
+    } else if (status === "error") {
+      this.props.authStore?.openNotification(
+        `${info.file.name} failed to upload.`
+      );
+    }
+  };
+  onRemove = (file: any) => {
+    console.log(file);
+    this.props.authStore?.deleteFile(file);
+  };
   render() {
     const { question, authStore } = this.props;
     //console.log(authStore);
     const props = {
       //style: { width: "30vw" },
       name: "file",
+      accept: API_URL.ACCEPT_FILES.join(","),
       multiple: true,
       listType: "text" as "picture" | "text" | "picture-card" | undefined,
       data: { qID: question.questionid, userid: authStore?.userid },
-      action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
+      //action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
       //this.handleUploadedFiles(value.files)
       defaultFileList: [],
       // value.files[0].id
@@ -65,15 +122,31 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         showRemoveIcon: true,
         removeIcon: <DeleteOutlined />,
       },
-      beforeUpload(file: RcFile, fileList: RcFile[]) {
-        console.log(file, fileList);
-        console.log(fileList[0].uid === file.uid);
-        // const temp = fileList.pop().map()
-        // const preList = temp?.map(ele=>ele.name)
-        // console.log(preList);
-        // if (preList?.includes(file.name)) return Upload.LIST_IGNORE;
-        // else return true;
-      },
+      //   beforeUpload(file: RcFile, fileList: Array<any>) {
+      //     console.log(file, fileList);
+      //     for (let f of fileList) {
+      //       if (f.size > API_URL.ACCEPT_SIZE) {
+      //         authStore?.openNotification(`File is too large.`);
+      //         return Upload.LIST_IGNORE;
+      //       }
+      //       if (authStore?.uploadedFiles.includes(f.name)) {
+      //         authStore?.openNotification(`Duplicate file found.`);
+      //         return Upload.LIST_IGNORE;
+      //       } else authStore?.addFileName(f.name);
+      //       const extension = `.${f.name
+      //         .split(".")
+      //         [f.name.split(".").length - 1].toLowerCase()}`;
+
+      //       if (!API_URL.ACCEPT_FILES.includes(extension)) {
+      //         authStore?.openNotification(
+      //           `File with extension "${extension} isn't allowed to upload."`
+      //         );
+      //         return Upload.LIST_IGNORE;
+      //       }
+      //     }
+
+      //     return true;
+      //   },
       onChange(info: any) {
         const { status } = info.file;
         if (status !== "uploading") {
@@ -82,7 +155,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         if (status === "done") {
           message.success(`${info.file.name} uploaded successfully.`);
         } else if (status === "error") {
-          message.error(`${info.file.name} file upload failed.`);
+          message.error(`${info.file.name} failed to upload.`);
         }
       },
       onDrop(e: any) {
@@ -90,7 +163,16 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       },
       onRemove(file: UploadFile<any>) {
         console.log(file);
+        authStore?.deleteFile(file.name);
         //authStore?.handleFileOnRemove(file);
+      },
+      progress: {
+        strokeColor: {
+          "0%": "#108ee9",
+          "100%": "#87d068",
+        },
+        strokeWidth: 3,
+        format: (percent: any) => `${parseFloat(percent.toFixed(2))}%`,
       },
     };
     return (
@@ -114,7 +196,21 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         )}
         <Form.Item name="fileUpload">
           <div style={{ marginTop: "4vh" }}>
-            <Dragger {...props}>
+            <Dragger
+              name="file"
+              accept={API_URL.ACCEPT_FILES.join(",")}
+              multiple={true}
+              listType="text"
+              showUploadList={{
+                showDownloadIcon: false,
+                //downloadIcon: "download ",
+                showRemoveIcon: true,
+                removeIcon: <DeleteOutlined />,
+              }}
+              customRequest={this.fileUpload}
+              onChange={this.onChange}
+              onRemove={this.onRemove}
+            >
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
               </p>

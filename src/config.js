@@ -14,6 +14,7 @@ const API_URL = {
   SUBMITRESPONSES: "api/submitResponses",
   HANDLE_FILE_UPDATE: "api/handleFileUpload",
   HANDLE_FILE_DOWNLOAD: "api/download/",
+  HANDLE_FILE_DELETE: "api/delete/",
   DEFAULT_PRINT_SERVICE: "http://localhost:9099",
   PRINTER_STATUS: `http://localhost:9099/printerStatus`,
   SITE: "/api/site",
@@ -26,6 +27,17 @@ const API_URL = {
   UPDATE_ORDER_STATUS: "/qapi/updateOrderStatus",
   GET_ORDER_DELIVERY: "/qapi/getDeliveryDetailByOrderId",
   WS_URL: WS_URL,
+  ACCEPT_FILES: [
+    ".doc",
+    ".docx",
+    ".pdf",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".xls",
+    ".xlsx",
+  ],
+  ACCEPT_SIZE: 31457280,
 };
 
 export default API_URL;
