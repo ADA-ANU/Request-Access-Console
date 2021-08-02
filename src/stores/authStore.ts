@@ -29,7 +29,7 @@ export class AuthStore {
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
-  @observable uploadedFiles: Array<string> = [];
+  @observable uploadedFiles: Map<any, any> = new Map();
   @observable doi: string | undefined;
   @observable dataFiles: Array<dataFiles> = [];
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
@@ -159,27 +159,39 @@ export class AuthStore {
         );
     }
   }
-  @action addFileName(name: string) {
-    this.uploadedFiles.push(name);
+  @action addFileName(qID: number, name: string) {
+    const prevArray = this.uploadedFiles.get(qID);
+    if (!prevArray) this.uploadedFiles.set(qID, [name]);
+    else {
+      this.uploadedFiles.set(qID, [...prevArray, name]);
+    }
   }
-  @action deleteFile(file: any) {
-    console.log(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`);
-    apiagent
-      .get(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`)
-      .then(
-        action((json) => {
-          console.log(json);
-          const temp = [...this.uploadedFiles].filter(
-            (ele) => ele !== file.name
-          );
-          this.uploadedFiles = temp;
-        })
-      )
-      .catch((error) => {
-        console.log(error);
+  @action deleteFile(qID: number, file: any) {
+    //console.log(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`);
+    if (file.error || !file.fileName) {
+      const temp = [...this.uploadedFiles.get(qID)].filter(
+        (ele) => ele !== file.name
+      );
+      this.uploadedFiles.set(qID, temp);
+    } else {
+      apiagent
+        .get(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`)
+        .then(
+          action((json) => {
+            console.log(json);
+            const temp = [...this.uploadedFiles.get(qID)].filter(
+              (ele) => ele !== file.name
+            );
+            this.uploadedFiles.set(qID, temp);
+            this.openNotificationSuccessful(`${file.name} deleted.`);
+          })
+        )
+        .catch((error) => {
+          console.log(error);
 
-        this.openNotification(error.data);
-      });
+          this.openNotification(error.data);
+        });
+    }
   }
 
   @action unauthorised(value: string) {
@@ -354,6 +366,7 @@ export class AuthStore {
     notification.error({
       message: `Oops`,
       description: msg,
+      duration: 0,
     });
   };
   openNotificationSuccessful = (msg: string) => {

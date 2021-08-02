@@ -21,7 +21,12 @@ import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
 import { RequestAccessQ, uploadFile } from "../stores/data.d";
 import { RouteComponentProps } from "react-router-dom";
-import { RcFile, UploadFile, UploadListType } from "antd/lib/upload/interface";
+import {
+  RcFile,
+  UploadChangeParam,
+  UploadFile,
+  UploadListType,
+} from "antd/lib/upload/interface";
 import systemStore from "../stores/systemStore";
 import { action, toJS } from "mobx";
 import { NotificationPlacement } from "antd/lib/notification";
@@ -58,6 +63,37 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
     const { onSuccess, onError, file, onProgress } = options;
     const { question, authStore } = this.props;
     console.log(file);
+    if (
+      authStore?.uploadedFiles.get(question.questionid) &&
+      authStore?.uploadedFiles.get(question.questionid).length >= 5
+    ) {
+      authStore?.openNotification(`Upload limit reached.`);
+      return onError(`File is too large.`);
+    }
+    if (file.size > API_URL.ACCEPT_SIZE) {
+      authStore?.openNotification(`File is too large.`);
+      return onError(`File is too large.`);
+    }
+    console.log(authStore?.uploadedFiles.get(question.questionid));
+    if (
+      authStore?.uploadedFiles.get(question.questionid) &&
+      authStore?.uploadedFiles.get(question.questionid).includes(file.name)
+    ) {
+      authStore?.openNotification(`Duplicate file found.`);
+      return onError(`Duplicate file found.`);
+    } else authStore?.addFileName(question.questionid, file.name);
+    const extension = `.${file.name
+      .split(".")
+      [file.name.split(".").length - 1].toLowerCase()}`;
+
+    if (!API_URL.ACCEPT_FILES.includes(extension)) {
+      authStore?.openNotification(
+        `File with extension "${extension}" isn't allowed to upload.`
+      );
+      return onError(
+        `File with extension "${extension}" isn't allowed to upload.`
+      );
+    }
     const fmData = new FormData();
     const config = {
       headers: { "content-type": "multipart/form-data" },
@@ -81,24 +117,19 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       });
   };
 
-  onChange = (info: any) => {
-    const { status } = info.file;
-    if (status !== "uploading") {
-      //console.log(info.file, info.fileList);
-    }
-    if (status === "done") {
+  onChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    // if (status !== "uploading") {
+    //   //console.log(info.file, info.fileList);
+    // }
+    if (info.file.status === "done") {
       this.props.authStore?.openNotificationSuccessful(
         `${info.file.name} successfully uploaded.`
-      );
-    } else if (status === "error") {
-      this.props.authStore?.openNotification(
-        `${info.file.name} failed to upload.`
       );
     }
   };
   onRemove = (file: any) => {
     console.log(file);
-    this.props.authStore?.deleteFile(file);
+    this.props.authStore?.deleteFile(this.props.question.questionid, file);
   };
   render() {
     const { question, authStore } = this.props;
@@ -109,7 +140,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       accept: API_URL.ACCEPT_FILES.join(","),
       multiple: true,
       listType: "text" as "picture" | "text" | "picture-card" | undefined,
-      data: { qID: question.questionid, userid: authStore?.userid },
+      //data: { qID: question.questionid, userid: authStore?.userid },
       //action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
       //this.handleUploadedFiles(value.files)
       defaultFileList: [],
@@ -122,50 +153,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         showRemoveIcon: true,
         removeIcon: <DeleteOutlined />,
       },
-      //   beforeUpload(file: RcFile, fileList: Array<any>) {
-      //     console.log(file, fileList);
-      //     for (let f of fileList) {
-      //       if (f.size > API_URL.ACCEPT_SIZE) {
-      //         authStore?.openNotification(`File is too large.`);
-      //         return Upload.LIST_IGNORE;
-      //       }
-      //       if (authStore?.uploadedFiles.includes(f.name)) {
-      //         authStore?.openNotification(`Duplicate file found.`);
-      //         return Upload.LIST_IGNORE;
-      //       } else authStore?.addFileName(f.name);
-      //       const extension = `.${f.name
-      //         .split(".")
-      //         [f.name.split(".").length - 1].toLowerCase()}`;
 
-      //       if (!API_URL.ACCEPT_FILES.includes(extension)) {
-      //         authStore?.openNotification(
-      //           `File with extension "${extension} isn't allowed to upload."`
-      //         );
-      //         return Upload.LIST_IGNORE;
-      //       }
-      //     }
-
-      //     return true;
-      //   },
-      onChange(info: any) {
-        const { status } = info.file;
-        if (status !== "uploading") {
-          console.log(info.file, info.fileList);
-        }
-        if (status === "done") {
-          message.success(`${info.file.name} uploaded successfully.`);
-        } else if (status === "error") {
-          message.error(`${info.file.name} failed to upload.`);
-        }
-      },
-      onDrop(e: any) {
-        console.log("Dropped files", e.dataTransfer.files);
-      },
-      onRemove(file: UploadFile<any>) {
-        console.log(file);
-        authStore?.deleteFile(file.name);
-        //authStore?.handleFileOnRemove(file);
-      },
       progress: {
         strokeColor: {
           "0%": "#108ee9",
@@ -175,14 +163,16 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         format: (percent: any) => `${parseFloat(percent.toFixed(2))}%`,
       },
     };
+
     return (
       <Form.Item
-        // key={question.displayorder}
-        // name={question.questionid}
+        //key={question.displayorder}
+        name={`upload-${question.questionid}`}
         label={question.questionstring}
         rules={[
           {
-            required: question.required,
+            //question.required
+            required: true,
             message: "This field cannot be empty.",
           },
         ]}
@@ -194,7 +184,17 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
             ))}
           </Row>
         )}
-        <Form.Item name="fileUpload">
+        <Form.Item
+          //key={question.displayorder}
+          //name="fileUpload"
+          rules={[
+            {
+              //question.required
+              required: true,
+              message: "This field cannot be empty.",
+            },
+          ]}
+        >
           <div style={{ marginTop: "4vh" }}>
             <Dragger
               name="file"
@@ -215,7 +215,17 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
                 <InboxOutlined />
               </p>
               <p className="ant-upload-text">
-                Click or drag files to this area to upload
+                Click or drag <strong> up to 10</strong> files to this area to
+                upload.
+              </p>
+              <p className="ant-upload-text">
+                Maximum size for each file is <strong>30 MB</strong>
+              </p>
+              <p className="ant-upload-text">
+                Allowed file types:{" "}
+                <strong>
+                  .doc, .docx, .pdf, .png, .jpg, .jpeg, .xls, .xlsx
+                </strong>
               </p>
               <p className="ant-upload-hint"></p>
             </Dragger>
