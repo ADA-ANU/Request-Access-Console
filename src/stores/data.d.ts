@@ -19,7 +19,8 @@ export interface RequestAccessQ {
   options: Array;
   questionid: number;
   guestbookid: number;
-  files: uploadFile[];
+  questionfiles: uploadFile[];
+  clientuploadedfiles: uploadFile[];
 }
 
 export interface uploadFile {

@@ -59,39 +59,59 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
     this.setState({ progress: progress });
   };
 
+  handleUploadedFiles = (files: any[]) =>
+    files.map((file) =>
+      Object.assign(
+        {},
+        {
+          uid: file.id,
+          name: file.originalname,
+          status: "done" as
+            | "success"
+            | "error"
+            | "done"
+            | "uploading"
+            | "removed"
+            | undefined,
+          url: `${API_URL.fileDownload}${file.filename}`,
+          fileName: file.filename,
+        }
+      )
+    );
   fileUpload = (options: any) => {
     const { onSuccess, onError, file, onProgress } = options;
     const { question, authStore } = this.props;
     console.log(file);
     if (
       authStore?.uploadedFiles.get(question.questionid) &&
-      authStore?.uploadedFiles.get(question.questionid).length >= 5
+      authStore?.uploadedFiles.get(question.questionid).length >=
+        API_URL.UPLOAD_LIMIT
     ) {
-      authStore?.openNotification(`Upload limit reached.`);
-      return onError(`File is too large.`);
+      //authStore?.openNotification(`Upload limit reached.`);
+      return onError(`Upload limit reached`);
     }
     if (file.size > API_URL.ACCEPT_SIZE) {
-      authStore?.openNotification(`File is too large.`);
-      return onError(`File is too large.`);
+      //authStore?.openNotification(`File is too large.`);
+      return onError(`File is too large`);
     }
     console.log(authStore?.uploadedFiles.get(question.questionid));
     if (
       authStore?.uploadedFiles.get(question.questionid) &&
       authStore?.uploadedFiles.get(question.questionid).includes(file.name)
     ) {
-      authStore?.openNotification(`Duplicate file found.`);
-      return onError(`Duplicate file found.`);
+      //authStore?.openNotification(`Duplicate file found.`);
+      return onError(`Duplicate file found`);
     } else authStore?.addFileName(question.questionid, file.name);
     const extension = `.${file.name
       .split(".")
       [file.name.split(".").length - 1].toLowerCase()}`;
 
     if (!API_URL.ACCEPT_FILES.includes(extension)) {
-      authStore?.openNotification(
-        `File with extension "${extension}" isn't allowed to upload.`
-      );
+      // authStore?.openNotification(
+      //   `File with extension "${extension}" isn't allowed to upload.`
+      // );
       return onError(
-        `File with extension "${extension}" isn't allowed to upload.`
+        `File with extension "${extension}" isn't allowed to upload`
       );
     }
     const fmData = new FormData();
@@ -113,17 +133,30 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       })
       .catch((e) => {
         console.log(e);
-        onError({ e });
+        // authStore?.openNotification(
+        //   e.data
+        //     ? `Failed to upload ${file.name} due to ${e.data}`
+        //     : `Failed to upload ${file.name} due to ${e}`
+        // );
+        onError(e.data ? e.data : e);
       });
   };
 
   onChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    console.log(info.file);
     // if (status !== "uploading") {
     //   //console.log(info.file, info.fileList);
     // }
     if (info.file.status === "done") {
       this.props.authStore?.openNotificationSuccessful(
         `${info.file.name} successfully uploaded.`
+      );
+    }
+    if (info.file.status === "error") {
+      this.props.authStore?.openNotification(
+        `Failed to upload ${info.file.name} as ${
+          info.file.error.e ? info.file.error.e : info.file.error
+        }.`
       );
     }
   };
@@ -133,7 +166,11 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
   };
   render() {
     const { question, authStore } = this.props;
-    //console.log(authStore);
+    console.log(
+      question.clientuploadedfiles[0],
+      question.clientuploadedfiles[0].id,
+      this.handleUploadedFiles(question.clientuploadedfiles)
+    );
     const props = {
       //style: { width: "30vw" },
       name: "file",
@@ -143,7 +180,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
       //data: { qID: question.questionid, userid: authStore?.userid },
       //action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
       //this.handleUploadedFiles(value.files)
-      defaultFileList: [],
+
       // value.files[0].id
       //   ? this.handleUploadedFiles(value.files)
       //   : ([] as UploadFile<any>[]),
@@ -177,13 +214,15 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
           },
         ]}
       >
-        {question.files && question.files[0] && question.files[0].id && (
-          <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
-            {question.files.map((file: uploadFile) => (
-              <FileDownload file={file} key={file.id} />
-            ))}
-          </Row>
-        )}
+        {question.questionfiles &&
+          question.questionfiles[0] &&
+          question.questionfiles[0].id && (
+            <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
+              {question.questionfiles.map((file: uploadFile) => (
+                <FileDownload file={file} key={file.id} />
+              ))}
+            </Row>
+          )}
         <Form.Item
           //key={question.displayorder}
           //name="fileUpload"
@@ -205,11 +244,27 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
                 showDownloadIcon: false,
                 //downloadIcon: "download ",
                 showRemoveIcon: true,
-                removeIcon: <DeleteOutlined />,
+                //removeIcon: <DeleteOutlined />,
               }}
+              defaultFileList={
+                question.clientuploadedfiles[0] &&
+                question.clientuploadedfiles[0].id
+                  ? (this.handleUploadedFiles(
+                      question.clientuploadedfiles
+                    ) as UploadFile<any>[])
+                  : ([] as UploadFile<any>[])
+              }
               customRequest={this.fileUpload}
               onChange={this.onChange}
               onRemove={this.onRemove}
+              progress={{
+                strokeColor: {
+                  "0%": "#108ee9",
+                  "100%": "#87d068",
+                },
+                strokeWidth: 3,
+                format: (percent: any) => `${parseFloat(percent.toFixed(2))}%`,
+              }}
             >
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />

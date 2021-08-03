@@ -38,6 +38,8 @@ const API_URL = {
     ".xlsx",
   ],
   ACCEPT_SIZE: 31457280,
+  UPLOAD_LIMIT: 10,
+  fileDownload: `${API_ROOT_URL}/api/clientFileDownload/`,
 };
 
 export default API_URL;

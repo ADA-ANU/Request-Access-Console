@@ -367,11 +367,13 @@ export class AuthStore {
       message: `Oops`,
       description: msg,
       duration: 0,
+      top: 80,
     });
   };
   openNotificationSuccessful = (msg: string) => {
     notification.success({
       message: msg,
+      top: 80,
     });
   };
 }
