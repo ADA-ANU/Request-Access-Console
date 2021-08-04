@@ -20,7 +20,7 @@ import {
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
-import { RequestAccessQ } from "../stores/data.d";
+import { RequestAccessQ, Country } from "../stores/data.d";
 import { RouteComponentProps } from "react-router-dom";
 import { UploadFile, UploadListType } from "antd/lib/upload/interface";
 import systemStore from "../stores/systemStore";
@@ -32,6 +32,7 @@ import { FormInstance } from "antd/lib/form";
 import Options from "./options";
 import Text from "./text";
 import FileUpload from "./fileUpload";
+import CountryList from "./countryList";
 const { Option } = Select;
 const { TextArea } = Input;
 // interface ReturnFileType{
@@ -61,6 +62,10 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
       const type = question.questiontype;
       if (type === "options") return <Options question={question} />;
       else if (type === "fileupload") return <FileUpload question={question} />;
+      else if (type === "countrylist")
+        return (
+          <CountryList list={authStore!.countryList} question={question} />
+        );
       else return <Text question={question} />;
     };
     return question && returnQuestion(question);

@@ -1411,6 +1411,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/country-flag-icons@^1.2.0":
+  "integrity" "sha512-96aveJfAw9iSfBxAD8DCgFYjMFmLIGa+vBvg3cKiHjX+o4Szz5HHv2DSbEVm9a4kLixsYkioGB4SnJs17Zypzw=="
+  "resolved" "https://registry.npmjs.org/@types/country-flag-icons/-/country-flag-icons-1.2.0.tgz"
+  "version" "1.2.0"
+
 "@types/d3-path@*":
   "integrity" "sha512-AZGHWslq/oApTAHu9+yH/Bnk63y9oFOMROtqPAtxl5uB6qm1x2lueWdVEjsjjV3Qc2+QfuzKIwIR5MvVBakfzA=="
   "resolved" "https://registry.npmjs.org/@types/d3-path/-/d3-path-1.0.8.tgz"
@@ -1863,7 +1868,7 @@
   dependencies:
     "color-convert" "^1.9.0"
 
-"antd@^4.16.8":
+"antd@4.16.8":
   "integrity" "sha512-xM1zheIYvS/0x05sM3Yj5cwBu6TjzS7RdwQug1bgbtDAk94dacuFvdLa4PjsvEiG6kz0uNzaaIaDBis7LRH5hA=="
   "resolved" "https://registry.npmjs.org/antd/-/antd-4.16.8.tgz"
   "version" "4.16.8"
@@ -3076,6 +3081,11 @@
     "parse-json" "^5.0.0"
     "path-type" "^4.0.0"
     "yaml" "^1.7.2"
+
+"country-flag-icons@^1.4.0":
+  "integrity" "sha512-tIeh/IZbm3G7O1ocNuEckmd1jkABkJzCPhQm+rBgJXkz1L+lKfwVY/rAy+ih06zGD4kagrZ+1eOndga09y8UHw=="
+  "resolved" "https://registry.npmjs.org/country-flag-icons/-/country-flag-icons-1.4.0.tgz"
+  "version" "1.4.0"
 
 "create-ecdh@^4.0.0":
   "integrity" "sha512-GbEHQPMOswGpKXM9kCWVrremUcBmjteUaQ01T9rkKCPDXfUHX0IoP9LpHYo2NPFampa4e+/pFDc3jQdxrxQLaw=="

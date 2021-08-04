@@ -23,6 +23,11 @@ export interface RequestAccessQ {
   clientuploadedfiles: uploadFile[];
 }
 
+export interface Country {
+  Code: string;
+  Name: string;
+}
+
 export interface uploadFile {
   id: number;
   filename: string;

@@ -4,7 +4,7 @@ import { Modal, notification } from "antd";
 import API_URL from "../config";
 import apiagent from "./apiagent";
 import systemStore from "./systemStore";
-import { AdminType, RestaurantType, RequestAccessQ, uploadFile } from "./data";
+import { AdminType, RestaurantType, RequestAccessQ, Country } from "./data";
 import { setWsHeartbeat } from "ws-heartbeat/client";
 import routingStore from "./routingStore";
 import moment from "moment";
@@ -29,6 +29,7 @@ export class AuthStore {
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
+  @observable countryList: Array<Country> = [];
   @observable uploadedFiles: Map<any, any> = new Map();
   @observable doi: string | undefined;
   @observable dataFiles: Array<dataFiles> = [];
@@ -114,6 +115,14 @@ export class AuthStore {
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
+            json.guestbook.map((q: RequestAccessQ) => {
+              if (q.questiontype === "fileupload") {
+                this.uploadedFiles.set(
+                  q.questionid,
+                  q.clientuploadedfiles.map((file) => file.originalname)
+                );
+              }
+            });
             const { firstname, lastname, dataset_title, DOI, userid } =
               json.info;
             this.userFirstName = firstname;
@@ -123,6 +132,8 @@ export class AuthStore {
             this.datasetTitle = dataset_title;
             this.doi = DOI;
             this.submitted = json.submitted;
+            this.countryList = json.countryList;
+            //console.log(json.countryList);
           })
         )
         .catch((error) => {
@@ -178,7 +189,7 @@ export class AuthStore {
         .get(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`)
         .then(
           action((json) => {
-            console.log(json);
+            console.log(json, qID, this.uploadedFiles.get(qID));
             const temp = [...this.uploadedFiles.get(qID)].filter(
               (ele) => ele !== file.name
             );
