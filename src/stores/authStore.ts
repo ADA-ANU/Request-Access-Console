@@ -246,7 +246,13 @@ export class AuthStore {
       .then(
         action((json) => {
           console.log(json);
-          this.submitted = true;
+          console.log(json.some((ele: any) => ele.status === "ERROR"));
+          this.submitted = this.submissionResult.some(
+            (ele) => ele.status === "ERROR"
+          )
+            ? true
+            : false;
+          console.log(this.submitted);
           this.showResultModal = true;
           this.submissionResult = json;
           //this.resultModal("submit");
@@ -259,7 +265,7 @@ export class AuthStore {
           this.errorMsg =
             "Session expired, please proceed to Dataverse to start over again.";
         } else {
-          this.openNotification(error.data);
+          this.openNotification(error.data ? error.data : error.statusText);
         }
       })
       .finally(

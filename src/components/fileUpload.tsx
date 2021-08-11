@@ -209,8 +209,8 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
         rules={[
           {
             //question.required
-            required: true,
-            message: "This field cannot be empty.",
+            //required: true,
+            //message: "This field cannot be empty.",
           },
         ]}
       >

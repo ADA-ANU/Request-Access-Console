@@ -458,7 +458,11 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                       fontSize: "16px",
                     }}
                   >
-                    {result.msg}
+                    {`${
+                      authStore?.dataFiles.find(
+                        (ele) => ele.id === result.datafileID
+                      )?.label
+                    } (${result.datafileID}): ${result.msg}`}
                   </li>
                 ))}
               </ol>

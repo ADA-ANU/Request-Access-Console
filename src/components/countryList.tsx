@@ -71,7 +71,11 @@ export default class CountryList extends React.Component<RequestAccessQuestionPr
         >
           {_list &&
             _list.map((country: Country) => (
-              <Option value={country.Name} label={country.Name}>
+              <Option
+                key={country.Name}
+                value={country.Name}
+                label={country.Name}
+              >
                 <div className="option-label-item">
                   <span
                     style={{ marginRight: "1vw" }}

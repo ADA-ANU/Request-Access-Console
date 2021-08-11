@@ -51,7 +51,7 @@ export default class DataFile extends React.Component<DataFileProps> {
           }}
         >
           <Checkbox
-            style={{ display: "block", marginLeft: 0 }}
+            style={{ marginLeft: 0 }}
             indeterminate={authStore?.indeterminate}
             onChange={authStore?.onCheckAllChange}
             checked={authStore?.checkall}
