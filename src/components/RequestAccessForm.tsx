@@ -38,7 +38,9 @@ import DataFile from "./dataFile";
 interface RequestAccessProps {
   //questions: Array<RequestAccessQuestion>;
   authStore?: AuthStore;
+  uploadQIDwithError: number[];
 }
+type MyState = { uploadQIDwithError: number[] };
 // interface IState {
 //     fileList: Array<any>,
 //     uploading: boolean,
@@ -48,7 +50,10 @@ interface RequestAccessProps {
 
 @inject("authStore")
 @observer
-export default class RequestAccessForm extends React.Component<RequestAccessProps> {
+export default class RequestAccessForm extends React.Component<
+  RequestAccessProps,
+  MyState
+> {
   RAFormRef = React.createRef<FormInstance>();
   handleCancel = () => {
     //this.props.form.resetFields();
@@ -59,7 +64,7 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
   };
 
   render() {
-    const { authStore } = this.props;
+    const { authStore, uploadQIDwithError } = this.props;
     console.log(toJS(authStore?.questions));
     return (
       <div style={{ margin: "auto", width: "50%", paddingTop: "3vh" }}>
@@ -67,7 +72,8 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
           id="requestAccess"
           ref={authStore?.formRef}
           layout="vertical"
-          scrollToFirstError={true}
+          size={"large"}
+          scrollToFirstError
           onFinish={this.handleSubmit}
           initialValues={authStore?.responseValues}
         >
@@ -76,7 +82,13 @@ export default class RequestAccessForm extends React.Component<RequestAccessProp
             authStore?.questions.map(
               (q, index) =>
                 q.hidden === false && (
-                  <RequestAccessQuestion question={q} key={index} />
+                  <div>
+                    <RequestAccessQuestion
+                      question={q}
+                      key={index}
+                      uploadQIDwithError={uploadQIDwithError}
+                    />
+                  </div>
                 )
             )}
           {!authStore?.submitted && authStore?.dataFiles && <DataFile />}

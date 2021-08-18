@@ -1,5 +1,5 @@
 import React from "react";
-import { observable, action, computed, reaction } from "mobx";
+import { observable, action, computed, reaction, toJS } from "mobx";
 import { Modal, notification } from "antd";
 import API_URL from "../config";
 import apiagent from "./apiagent";
@@ -23,6 +23,7 @@ export class AuthStore {
   @observable isLoading: boolean = false;
   @observable submitting: boolean = false;
   @observable submitted: boolean = false;
+  @observable validationError: boolean = false;
   @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
   @observable userid: number | undefined;
@@ -37,7 +38,7 @@ export class AuthStore {
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
   @observable formRef = React.createRef<FormInstance>();
-  @observable responseValues: object = {};
+  @observable responseValues: { [k: number]: any } = {};
   @observable token: string | undefined;
   @observable authenticated: boolean = true;
   @observable errorMsg: string | undefined;
@@ -113,13 +114,17 @@ export class AuthStore {
             this.checkedDataFiles = json.info.inputDataFileIDs;
             this.dataFiles = dfs;
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
+            console.log(json.responseValues);
+            //json.responseValues[755] = undefined;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
             json.guestbook.map((q: RequestAccessQ) => {
               if (q.questiontype === "fileupload") {
                 this.uploadedFiles.set(
                   q.questionid,
-                  q.clientuploadedfiles.map((file) => file.originalname)
+                  q.clientuploadedfiles
+                    ? q.clientuploadedfiles.map((file) => file.originalname)
+                    : []
                 );
               }
             });
@@ -152,7 +157,7 @@ export class AuthStore {
               "Email unconfirmed, please proceed to Dataverse to confirm your email."
             );
           } else {
-            console.log("777");
+            console.log("777", error.data ? error.data : error);
             this.unauthorised(
               error.data ? error.data : "Server error, please try again."
             );
@@ -170,12 +175,17 @@ export class AuthStore {
         );
     }
   }
+  @action handleValidationError(value: boolean) {
+    this.validationError = value;
+  }
   @action addFileName(qID: number, name: string) {
     const prevArray = this.uploadedFiles.get(qID);
     if (!prevArray) this.uploadedFiles.set(qID, [name]);
     else {
       this.uploadedFiles.set(qID, [...prevArray, name]);
     }
+    this.handleValidationError(false);
+    this.formRef.current?.validateFields();
   }
   @action deleteFile(qID: number, file: any) {
     //console.log(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`);
@@ -213,9 +223,14 @@ export class AuthStore {
     this.formRef.current
       ?.validateFields()
       .then((values) => {
+        this.handleValidationError(false);
+        console.log(toJS(values));
         this.showModal = true;
       })
-      .catch((err) => {});
+      .catch((err) => {
+        this.handleValidationError(true);
+        console.log(err);
+      });
   }
   @action handleModal(value: boolean) {
     this.showModal = value;
@@ -224,7 +239,7 @@ export class AuthStore {
   @action handleResultModal(value: boolean) {
     this.showResultModal = value;
   }
-  @action submit(values: object) {
+  @action submit(values: { [k: number]: any }) {
     this.submitting = true;
     console.log(values);
     //this.handleModal(false);
@@ -238,6 +253,11 @@ export class AuthStore {
       this.submitting = false;
       return;
     }
+    for (let q of this.questions!) {
+      if (q.questiontype === "fileupload") {
+        values[q.questionid] = null;
+      }
+    }
     apiagent
       .post(API_URL.SUBMITRESPONSES, {
         token: this.token,
@@ -246,12 +266,13 @@ export class AuthStore {
       .then(
         action((json) => {
           console.log(json);
-          console.log(json.some((ele: any) => ele.status === "ERROR"));
-          this.submitted = this.submissionResult.some(
-            (ele) => ele.status === "ERROR"
-          )
-            ? true
-            : false;
+          console.log(
+            json.some((ele: any) => ele.status === "ERROR"),
+            json.some((ele: any) => ele.status === "ERROR") ? false : true
+          );
+          this.submitted = json.some((ele: any) => ele.status === "ERROR")
+            ? false
+            : true;
           console.log(this.submitted);
           this.showResultModal = true;
           this.submissionResult = json;

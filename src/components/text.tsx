@@ -57,7 +57,12 @@ export default class Text extends React.Component<RequestAccessQuestionProps> {
           },
         ]}
       >
-        <TextArea rows={4} disabled={authStore?.submitted} />
+        <TextArea
+          rows={4}
+          disabled={authStore?.submitted}
+          maxLength={question.wordlimit || 255}
+          showCount
+        />
       </Form.Item>
     );
   }

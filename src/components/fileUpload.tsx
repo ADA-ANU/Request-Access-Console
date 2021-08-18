@@ -45,6 +45,7 @@ const { Dragger } = Upload;
 interface RequestAccessFileUploadProps {
   question: RequestAccessQ;
   authStore?: AuthStore;
+  uploadQIDwithError: number[];
 }
 
 @inject("authStore")
@@ -164,75 +165,74 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
     console.log(file);
     this.props.authStore?.deleteFile(this.props.question.questionid, file);
   };
-  render() {
-    const { question, authStore } = this.props;
+  checkUpload = (_: any, value: any) => {
+    //return Promise.resolve();
+    const { question } = this.props;
     console.log(
-      question.clientuploadedfiles[0],
-      question.clientuploadedfiles[0].id,
-      this.handleUploadedFiles(question.clientuploadedfiles)
+      "validate",
+      question.required,
+      authStore?.uploadedFiles.get(question.questionid).length
     );
-    const props = {
-      //style: { width: "30vw" },
-      name: "file",
-      accept: API_URL.ACCEPT_FILES.join(","),
-      multiple: true,
-      listType: "text" as "picture" | "text" | "picture-card" | undefined,
-      //data: { qID: question.questionid, userid: authStore?.userid },
-      //action: `${API_URL.ROOT_URL}/${API_URL.HANDLE_FILE_UPDATE}`,
-      //this.handleUploadedFiles(value.files)
-
-      // value.files[0].id
-      //   ? this.handleUploadedFiles(value.files)
-      //   : ([] as UploadFile<any>[]),
-      showUploadList: {
-        showDownloadIcon: false,
-        //downloadIcon: "download ",
-        showRemoveIcon: true,
-        removeIcon: <DeleteOutlined />,
-      },
-
-      progress: {
-        strokeColor: {
-          "0%": "#108ee9",
-          "100%": "#87d068",
-        },
-        strokeWidth: 3,
-        format: (percent: any) => `${parseFloat(percent.toFixed(2))}%`,
-      },
-    };
-
+    try {
+      if (
+        !question.required ||
+        (question.required &&
+          authStore?.uploadedFiles.get(question.questionid).length > 0)
+      ) {
+        console.log("pass");
+        return Promise.resolve();
+      } else {
+        this.props.authStore?.handleValidationError(true);
+        return Promise.reject(new Error("No file uploaded."));
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  render() {
+    const { question, authStore, uploadQIDwithError } = this.props;
+    //console.log(question.questionfiles.length, question.questionfiles[0].id);
     return (
       <Form.Item
         //key={question.displayorder}
-        name={`upload-${question.questionid}`}
+        name={question.questionid}
         label={question.questionstring}
+        //validateStatus={"validating"}
         rules={[
+          { required: question.required },
           {
-            //question.required
-            //required: true,
-            //message: "This field cannot be empty.",
+            validator: this.checkUpload,
           },
         ]}
+        // validateStatus={
+        //   !question.required ||
+        //   (question.required &&
+        //     authStore?.uploadedFiles.get(question.questionid).length > 0)
+        //     ? "success"
+        //     : "error"
+        // }
+        // help={
+        //   !question.required ||
+        //   (question.required &&
+        //     authStore?.uploadedFiles.get(question.questionid).length > 0)
+        //     ? undefined
+        //     : "At leaset one file should be uploaded"
+        // }
       >
-        {question.questionfiles &&
-          question.questionfiles[0] &&
-          question.questionfiles[0].id && (
-            <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
-              {question.questionfiles.map((file: uploadFile) => (
+        {question.questionfiles && question.questionfiles.length > 0 && (
+          //question.questionfiles[0].id &&
+          <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 }, 16]}>
+            {question.questionfiles.map((file: uploadFile, index: number) => (
+              <Form.Item key={index} noStyle>
                 <FileDownload file={file} key={file.id} />
-              ))}
-            </Row>
-          )}
+              </Form.Item>
+            ))}
+          </Row>
+        )}
         <Form.Item
           //key={question.displayorder}
+          noStyle
           //name="fileUpload"
-          rules={[
-            {
-              //question.required
-              required: true,
-              message: "This field cannot be empty.",
-            },
-          ]}
         >
           <div style={{ marginTop: "4vh" }}>
             <Dragger
@@ -247,7 +247,8 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
                 //removeIcon: <DeleteOutlined />,
               }}
               defaultFileList={
-                question.clientuploadedfiles[0] &&
+                question.clientuploadedfiles &&
+                question.clientuploadedfiles.length &&
                 question.clientuploadedfiles[0].id
                   ? (this.handleUploadedFiles(
                       question.clientuploadedfiles

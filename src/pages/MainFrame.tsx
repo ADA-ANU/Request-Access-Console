@@ -34,6 +34,7 @@ import {
   PoweroffOutlined,
   ExclamationCircleOutlined,
   CheckCircleTwoTone,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import RequestAccessForm from "../components/RequestAccessForm";
 import Parser from "html-react-parser";
@@ -49,6 +50,9 @@ export interface IMainFrameProps extends IRoutingProps {
 @inject("systemStore", "routingStore", "authStore")
 @observer
 export default class MainFrame extends React.Component<IMainFrameProps> {
+  state = {
+    uploadQIDwithError: [],
+  };
   componentDidMount() {
     const pathname = this.props.routingStore?.location.pathname;
     const param = pathname?.split("/")[1];
@@ -57,8 +61,34 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
       this.props.authStore?.unauthorised("No guestbook was found.");
     } else this.props.authStore?.init(param);
   }
+  submissionCheck = () => {
+    console.log("checking");
+    // let qidWithError: number[] = [];
+    // this.props.authStore?.uploadedFiles.forEach(
+    //   (value: string[], key: number) => {
+    //     const question = this.props.authStore?.questions?.find(
+    //       (q) => q.questionid === key
+    //     );
+    //     if (question && question?.required && value.length === 0) {
+    //       qidWithError.push(key);
+    //     }
+    //   }
+    // );
+    // if (qidWithError.length > 0) {
+    //   console.log(qidWithError);
+    //   this.setState((prevState) => {
+    //     return {
+    //       uploadQIDwithError: qidWithError,
+    //     };
+    //   });
+    // } else {
+    console.log("checking");
+    this.props.authStore?.confirmModal();
+    //}
+  };
   render() {
-    let { systemStore, routingStore } = this.props;
+    let { systemStore, routingStore, authStore } = this.props;
+    const { uploadQIDwithError } = this.state;
     const menu = (
       <Menu>
         <Menu.Item key="0" icon={<KeyOutlined />}>
@@ -160,7 +190,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
               >
                 <div style={{ paddingLeft: "1vw" }}>
                   <span>
-                    {authStore.userFirstName && authStore.userLastName
+                    {authStore?.userFirstName && authStore.userLastName
                       ? `${authStore.userFirstName} ${authStore.userLastName}`
                       : "Guest"}
                   </span>
@@ -169,8 +199,8 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             </Row>
           </Header>
         </Affix>
-        <Content style={{ padding: "1%" }}>
-          {authStore.authenticated ? (
+        <Content style={{ padding: "1%", marginBottom: "15vh" }}>
+          {authStore?.authenticated ? (
             this.props.authStore?.isLoading ? (
               <div style={{ width: "70%", margin: "auto" }}>
                 <Skeleton active title={true} paragraph={{ rows: 20 }} />
@@ -188,14 +218,23 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 </div>
                 {this.props.authStore?.submitted ? (
                   <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                    <Title level={4}>This form has been submitted.</Title>
+                    <Row justify="center" gutter={16}>
+                      <Col>
+                        <CheckCircleOutlined
+                          style={{ color: "#007916", fontSize: "3vh" }}
+                        />
+                      </Col>
+                      <Col>
+                        <Title level={4}>This form has been submitted.</Title>
+                      </Col>
+                    </Row>
                   </div>
                 ) : null}
-                <RequestAccessForm />
+                <RequestAccessForm uploadQIDwithError={uploadQIDwithError} />
                 {!authStore.submitted ? (
                   <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                    <Row justify="center">
-                      <Col span={2} offset={0}>
+                    <Row>
+                      <Col span={2} offset={9}>
                         <Button
                           //form="requestAccess"
                           key="save"
@@ -203,13 +242,13 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                           type="primary"
                           //icon={<PoweroffOutlined />}
                           loading={authStore.submitting}
-                          onClick={() => authStore.save()}
+                          onClick={() => authStore!.save()}
                           disabled={authStore.submitted}
                         >
                           Save!
                         </Button>
                       </Col>
-                      <Col span={2} offset={1}>
+                      <Col span={2} offset={2}>
                         <div>
                           <Button
                             form="requestAccess"
@@ -219,11 +258,19 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                             icon={<PoweroffOutlined />}
                             loading={authStore.submitting}
                             disabled={authStore.submitted}
-                            onClick={() => authStore.confirmModal()}
+                            onClick={() => this.submissionCheck()}
                           >
                             Submit!
                           </Button>
                         </div>
+                      </Col>
+                      <Col span={3}>
+                        {authStore?.validationError && (
+                          <Text type="danger" strong>
+                            You must answer all questions unless they are marked
+                            optional.
+                          </Text>
+                        )}
                       </Col>
                     </Row>
                   </div>
@@ -248,7 +295,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 }}
                 src={warningLogo}
               />
-              <Title level={3}>{authStore.errorMsg}</Title>
+              <Title level={3}>{authStore?.errorMsg}</Title>
             </div>
           )}
 
@@ -263,9 +310,14 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                                     <Route exact path='/dashboard/hccda-images' component={hccdaImages} /> */}
         </Content>
 
-        <Footer style={{ textAlign: "center" }}>
-          <hr />
-          <Row justify="center" style={{ paddingTop: "2vh" }}>
+        <Footer
+          style={{
+            textAlign: "center",
+            backgroundColor: "white",
+            paddingTop: "0",
+          }}
+        >
+          <Row justify="center" style={{ paddingTop: "5vh" }}>
             <img
               className="logo"
               style={{
@@ -307,16 +359,16 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
           <br />
           <Row justify="center">
             © {new Date().getFullYear()} Australian Data Archive (Australian
-            National University) | All Rights Reserved.
+            National University) All Rights Reserved.
           </Row>
           <Modal
-            visible={authStore.showModal}
+            visible={authStore?.showModal}
             //title="Terms and Conditions"
             width="60%"
             closable={false}
             maskClosable={false}
-            onOk={() => authStore.handleModal(false)}
-            onCancel={() => authStore.handleModal(false)}
+            onOk={() => authStore?.handleModal(false)}
+            onCancel={() => authStore?.handleModal(false)}
             footer={null}
           >
             <p
@@ -345,7 +397,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 >
                   Terms of Access
                 </p>
-                {authStore.termsOfAccess}
+                {authStore?.termsOfAccess}
               </Col>
               <Col span={10} offset={2}>
                 <p
@@ -359,7 +411,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 </p>
                 <div style={{ maxHeight: "40vh", overflow: "auto" }}>
                   {
-                    Parser(authStore.termsOfUse!)
+                    Parser(authStore?.termsOfUse!)
                     // <div
                     //   dangerouslySetInnerHTML={{ __html: authStore.termsOfUse! }}
                     // />
@@ -374,7 +426,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   value={authStore?.termsCheckboxValues}
                   onChange={authStore?.termsOnchange}
                 >
-                  {authStore.termsCheckboxes.map((term, index) => (
+                  {authStore?.termsCheckboxes.map((term, index) => (
                     <Row key={index}>
                       <Checkbox value={term}>{term}</Checkbox>
                     </Row>
@@ -388,7 +440,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
 
             <Row justify="center" style={{ paddingTop: "2vh" }}>
               <Col>
-                <Button key="back" onClick={() => authStore.handleModal(false)}>
+                <Button
+                  key="back"
+                  onClick={() => authStore?.handleModal(false)}
+                >
                   Return
                 </Button>
               </Col>
@@ -398,10 +453,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   key="submit"
                   htmlType="submit"
                   type="primary"
-                  loading={authStore.submitting}
+                  loading={authStore?.submitting}
                   //onClick={() => authStore.handleModal(false)}
                   disabled={
-                    authStore.termsCheckboxValues.length !== 2 ||
+                    authStore?.termsCheckboxValues.length !== 2 ||
                     authStore.termsCheckboxValues.sort().join(",") !==
                       authStore.termsCheckboxes.sort().join(",")
                   }
@@ -413,7 +468,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
           </Modal>
           <Modal
             title={
-              authStore.submissionResult.some(
+              authStore?.submissionResult.some(
                 (ele) => ele.status === "ERROR"
               ) ? (
                 <Row>
@@ -442,12 +497,12 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             }
             closable={false}
             maskClosable={false}
-            visible={authStore.showResultModal}
-            onOk={() => authStore.handleResultModal(false)}
-            onCancel={() => authStore.handleResultModal(false)}
+            visible={authStore?.showResultModal}
+            onOk={() => authStore?.handleResultModal(false)}
+            onCancel={() => authStore?.handleResultModal(false)}
             footer={null}
           >
-            {authStore.submissionResult &&
+            {authStore?.submissionResult &&
             authStore.submissionResult.length > 0 ? (
               <ol>
                 {authStore.submissionResult.map((result, index) => (
@@ -471,7 +526,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
               <Button
                 key="OK"
                 type="primary"
-                onClick={() => authStore.handleResultModal(false)}
+                onClick={() => authStore?.handleResultModal(false)}
               >
                 OK
               </Button>

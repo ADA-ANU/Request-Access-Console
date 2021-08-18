@@ -40,7 +40,7 @@ export default class DataFile extends React.Component<DataFileProps> {
 
     return (
       <>
-        <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+        <div style={{ textAlign: "center", paddingTop: "18vh" }}>
           <Title level={4}>Request access to files in the same dataset</Title>
         </div>
         <div

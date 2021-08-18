@@ -42,6 +42,7 @@ interface RequestAccessQuestionProps {
   question: RequestAccessQ;
   authStore?: AuthStore;
   key: number;
+  uploadQIDwithError: number[];
 }
 
 @inject("authStore")
@@ -56,12 +57,18 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
   };
 
   render() {
-    const { authStore, question } = this.props;
+    const { authStore, question, uploadQIDwithError } = this.props;
     //console.log(authStore);
     const returnQuestion = (question: RequestAccessQ) => {
       const type = question.questiontype;
       if (type === "options") return <Options question={question} />;
-      else if (type === "fileupload") return <FileUpload question={question} />;
+      else if (type === "fileupload")
+        return (
+          <FileUpload
+            question={question}
+            uploadQIDwithError={uploadQIDwithError}
+          />
+        );
       else if (type === "countrylist")
         return (
           <CountryList list={authStore!.countryList} question={question} />

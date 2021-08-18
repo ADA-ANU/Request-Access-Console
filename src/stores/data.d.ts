@@ -21,6 +21,7 @@ export interface RequestAccessQ {
   guestbookid: number;
   questionfiles: uploadFile[];
   clientuploadedfiles: uploadFile[];
+  wordlimit: number;
 }
 
 export interface Country {
