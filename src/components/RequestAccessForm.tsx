@@ -82,7 +82,7 @@ export default class RequestAccessForm extends React.Component<
             authStore?.questions.map(
               (q, index) =>
                 q.hidden === false && (
-                  <div>
+                  <div key={index}>
                     <RequestAccessQuestion
                       question={q}
                       key={index}
@@ -91,7 +91,8 @@ export default class RequestAccessForm extends React.Component<
                   </div>
                 )
             )}
-          {!authStore?.submitted && authStore?.dataFiles && <DataFile />}
+
+          {authStore?.dataFiles && <DataFile />}
         </Form>
       </div>
     );

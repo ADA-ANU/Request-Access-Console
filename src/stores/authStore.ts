@@ -24,6 +24,7 @@ export class AuthStore {
   @observable submitting: boolean = false;
   @observable submitted: boolean = false;
   @observable validationError: boolean = false;
+  @observable datasetURL: string | undefined;
   @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
   @observable userid: number | undefined;
@@ -93,10 +94,11 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json.dataFiles);
+            console.log(json.dataFiles, json.datasetURL);
             // console.log(json.responseValues);
             // console.log(json.info, json.submitted);
             //console.log(json.terms);
+            this.datasetURL = json.datasetURL;
             const dfs = json.dataFiles.map((d: any) => {
               d["value"] = d.id;
               if (d.assigneeidentifier || d.authenticated_user_id)
@@ -389,7 +391,9 @@ export class AuthStore {
       this.dataFiles.map((d: dataFiles) => {
         if (!d.disabled) checkedFiles.push(d.id);
       });
-    } else checkedFiles = [...this.inputCheckedDataFiles];
+    }
+    //...this.inputCheckedDataFiles
+    else checkedFiles = [];
     return checkedFiles;
   };
   resultModal = (type: string) => {

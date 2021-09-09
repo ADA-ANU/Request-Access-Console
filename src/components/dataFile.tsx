@@ -68,11 +68,10 @@ export default class DataFile extends React.Component<DataFileProps> {
             {authStore?.dataFiles.map((file) => {
               //console.log(file);
               //console.log(authStore?.checkedDataFiles.includes(file.id));
+              //disabled={file.disabled}
               return (
                 <Row key={file.id}>
-                  <Checkbox value={file.id} disabled={file.disabled}>
-                    {file.label}
-                  </Checkbox>
+                  <Checkbox value={file.id}>{file.label}</Checkbox>
                 </Row>
               );
             })}

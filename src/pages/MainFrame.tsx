@@ -153,7 +153,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                     paddingTop: "1%",
                   }}
                 >
-                  <Title level={3}>REQUEST ACCESS</Title>
+                  <Title level={3}>REQUEST ACCESS MANAGEMENT SYSTEM</Title>
                 </div>
               </Col>
               <Col
@@ -214,7 +214,17 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                     textAlign: "center",
                   }}
                 >
-                  <Title level={3}>{authStore.datasetTitle}</Title>
+                  <Title level={3}>Dataset: {authStore.datasetTitle}</Title>
+                  <Row justify="center" align="middle">
+                    <Col>
+                      <Title level={4}>Link:</Title>
+                    </Col>
+                    <Col style={{ marginLeft: "1vw", marginBottom: "10px" }}>
+                      <a href={authStore.datasetURL} target="_blank">
+                        {authStore.datasetURL}
+                      </a>
+                    </Col>
+                  </Row>
                 </div>
                 {this.props.authStore?.submitted ? (
                   <div style={{ textAlign: "center", paddingTop: "5vh" }}>
@@ -257,7 +267,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                             type="primary"
                             icon={<PoweroffOutlined />}
                             loading={authStore.submitting}
-                            disabled={authStore.submitted}
+                            disabled={
+                              authStore.submitted ||
+                              authStore?.checkedDataFiles.length === 0
+                            }
                             onClick={() => this.submissionCheck()}
                           >
                             Submit!
