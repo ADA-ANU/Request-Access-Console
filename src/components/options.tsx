@@ -60,7 +60,7 @@ export default class Options extends React.Component<RequestAccessQuestionProps>
         <Select
           style={{ width: "100%" }}
           allowClear
-          disabled={authStore?.submitted}
+          disabled={authStore?.submitted || authStore?.hasAnyFileSubmitted}
         >
           {question.options.map((option: string) => (
             <Option key={option} value={option}>

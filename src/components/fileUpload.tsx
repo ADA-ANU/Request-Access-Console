@@ -240,6 +240,7 @@ export default class FileUpload extends React.Component<RequestAccessFileUploadP
               accept={API_URL.ACCEPT_FILES.join(",")}
               multiple={true}
               listType="text"
+              disabled={authStore?.submitted || authStore?.hasAnyFileSubmitted}
               showUploadList={{
                 showDownloadIcon: false,
                 //downloadIcon: "download ",

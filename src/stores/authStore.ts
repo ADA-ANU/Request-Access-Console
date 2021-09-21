@@ -16,6 +16,7 @@ import {
 import { ResultType, dataFiles, submissionResult } from "../stores/data.d";
 import { file } from "jszip";
 import { RcFile } from "antd/lib/upload";
+import { CheckboxChangeEvent } from "../../node_modules/antd/es/checkbox";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -23,7 +24,9 @@ export class AuthStore {
   @observable isLoading: boolean = false;
   @observable submitting: boolean = false;
   @observable submitted: boolean = false;
+  @observable hasAnyFileSubmitted: boolean = false;
   @observable validationError: boolean = false;
+  @observable emailNotification: boolean = true;
   @observable datasetURL: string | undefined;
   @observable result: boolean = false;
   @observable questions?: Array<RequestAccessQ>;
@@ -31,10 +34,13 @@ export class AuthStore {
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
   @observable datasetTitle: string | undefined;
+  @observable userEmail: string | undefined;
   @observable countryList: Array<Country> = [];
   @observable uploadedFiles: Map<any, any> = new Map();
   @observable doi: string | undefined;
   @observable dataFiles: Array<dataFiles> = [];
+  @observable submittedFileIDs: Array<number> = [];
+  @observable unrestrictedFileIDs: Array<number> = [];
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
@@ -57,6 +63,7 @@ export class AuthStore {
   ];
   @observable termsCheckboxValues: Array<string> = [];
   @observable submissionResult: Array<submissionResult> = [];
+  @observable ticketID: number | undefined;
   constructor() {
     this.initApp();
   }
@@ -94,28 +101,38 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json.dataFiles, json.datasetURL);
+            console.log(json);
             // console.log(json.responseValues);
             // console.log(json.info, json.submitted);
             //console.log(json.terms);
             this.datasetURL = json.datasetURL;
             const dfs = json.dataFiles.map((d: any) => {
               d["value"] = d.id;
-              if (d.assigneeidentifier || d.authenticated_user_id)
+              if (
+                d.restricted &&
+                (d.assigneeidentifier || d.authenticated_user_id)
+              ) {
                 d.disabled = true;
-              else d.disabled = false;
-              if (d.assigneeidentifier) d.label += "(Approved)";
-              if (d.authenticated_user_id) d.label += "(Requested)";
-              if (json.info.inputDataFileIDs.includes(d.id)) d.disabled = true;
+              } else {
+                d.disabled = false;
+              }
+              if (d.restricted && !d.disabled) this.checkedDataFiles.push(d.id);
+              if (d.assigneeidentifier) d.label += " (Approved)";
+              if (d.authenticated_user_id) {
+                d.label += " (Requested)";
+                this.hasAnyFileSubmitted = true;
+              }
+              //if (json.info.inputDataFileIDs.includes(d.id)) d.disabled = true;
               return d;
             });
             //console.log(dfs);
             const { termsofaccess, termsofuse } = json.terms[0];
             this.termsOfAccess = termsofaccess;
             this.termsOfUse = termsofuse;
-            this.checkedDataFiles = json.info.inputDataFileIDs;
+            //this.checkedDataFiles = json.info.inputDataFileIDs;
             this.dataFiles = dfs;
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
+            this.userEmail = json.info.email;
             console.log(json.responseValues);
             //json.responseValues[755] = undefined;
             this.responseValues = json.responseValues;
@@ -138,7 +155,10 @@ export class AuthStore {
             this.userid = userid;
             this.datasetTitle = dataset_title;
             this.doi = DOI;
-            this.submitted = json.submitted;
+            this.submitted = json.submitted.length > 0;
+            console.log(json.submittedFileIDs);
+            this.submittedFileIDs = json.submittedFileIDs;
+            this.unrestrictedFileIDs = json.unrestrictedFileIDs;
             this.countryList = json.countryList;
             //console.log(json.countryList);
           })
@@ -161,7 +181,9 @@ export class AuthStore {
           } else {
             console.log("777", error.data ? error.data : error);
             this.unauthorised(
-              error.data ? error.data : "Server error, please try again."
+              error.data && error.data.msg
+                ? error.data.msg
+                : "Server error, please try again."
             );
             //this.openNotification(error.data);
             // this.authenticated = false;
@@ -224,11 +246,13 @@ export class AuthStore {
   @action confirmModal() {
     this.formRef.current
       ?.validateFields()
-      .then((values) => {
-        this.handleValidationError(false);
-        console.log(toJS(values));
-        this.showModal = true;
-      })
+      .then(
+        action((values) => {
+          this.handleValidationError(false);
+          console.log(toJS(values));
+          this.showModal = true;
+        })
+      )
       .catch((err) => {
         this.handleValidationError(true);
         console.log(err);
@@ -264,20 +288,23 @@ export class AuthStore {
       .post(API_URL.SUBMITRESPONSES, {
         token: this.token,
         responses: values,
+        checkedDataFiles: this.checkedDataFiles,
       })
       .then(
         action((json) => {
           console.log(json);
-          console.log(
-            json.some((ele: any) => ele.status === "ERROR"),
-            json.some((ele: any) => ele.status === "ERROR") ? false : true
-          );
-          this.submitted = json.some((ele: any) => ele.status === "ERROR")
+          // console.log(
+          //   json.some((ele: any) => ele.status === "ERROR"),
+          //   json.some((ele: any) => ele.status === "ERROR") ? false : true
+          // );
+          const { result, ticketID } = json;
+          this.submitted = result.some((ele: any) => ele.status === "ERROR")
             ? false
             : true;
           console.log(this.submitted);
           this.showResultModal = true;
-          this.submissionResult = json;
+          this.submissionResult = result;
+          this.ticketID = ticketID;
           //this.resultModal("submit");
         })
       )
@@ -313,6 +340,7 @@ export class AuthStore {
             token: this.token,
             responses: values,
             checkedDataFiles: this.checkedDataFiles,
+            emailNotification: this.emailNotification,
           })
           .then(
             action((json) => {
@@ -349,9 +377,20 @@ export class AuthStore {
   }
   @action onChange = (list: any) => {
     console.log(list);
+    //console.log(this.submittedFileIDs.length);
+    console.log(this.dataFiles.length);
     this.checkedDataFiles = list;
-    this.indeterminate = !!list.length && list.length < this.dataFiles.length;
-    this.checkall = list.length === this.dataFiles.length;
+    this.indeterminate =
+      !!list.length &&
+      list.length <
+        this.dataFiles.length -
+          this.submittedFileIDs.length -
+          this.unrestrictedFileIDs.length;
+    this.checkall =
+      list.length ===
+      this.dataFiles.length -
+        this.submittedFileIDs.length -
+        this.unrestrictedFileIDs.length;
   };
   @action individualOnChange = (e: any, fileID: number) => {
     console.log(e, fileID);
@@ -377,6 +416,7 @@ export class AuthStore {
   };
   @action onCheckAllChange = (e: any) => {
     this.checkedDataFiles = this.sortChcked(e.target.checked);
+    console.log(this.checkedDataFiles);
     this.indeterminate = false;
     this.checkall = e.target.checked;
   };
@@ -386,21 +426,44 @@ export class AuthStore {
   };
 
   sortChcked = (checked: boolean) => {
-    var checkedFiles: Array<number> = [...this.inputCheckedDataFiles];
+    var checkedFiles: number[] = [];
+    //Array<number> = [...this.inputCheckedDataFiles];
+    console.log(checkedFiles, this.submittedFileIDs);
     if (checked) {
       this.dataFiles.map((d: dataFiles) => {
-        if (!d.disabled) checkedFiles.push(d.id);
+        //console.log(d, !d.disabled, !this.unrestrictedFileIDs.includes(d.id));
+        if (!d.disabled && !this.unrestrictedFileIDs.includes(d.id)) {
+          checkedFiles.push(d.id);
+        }
       });
     }
     //...this.inputCheckedDataFiles
     else checkedFiles = [];
+    console.log(checkedFiles);
     return checkedFiles;
   };
+
+  @action emailNotificationOnChange = (e: CheckboxChangeEvent) => {
+    this.emailNotification = e.target.checked;
+    localStorage.setItem(
+      "ADA_Request_Access",
+      JSON.stringify({ notification: e.target.checked })
+    );
+  };
+
+  @action emailNotificationOnChangeWithoutLocalStorage = (value: boolean) => {
+    this.emailNotification = value;
+  };
+
   resultModal = (type: string) => {
     Modal.success({
+      width: 500,
+      centered: true,
       title:
         type === "save"
-          ? `Your answers have been saved, a confirmation email has been sent to your registered email address.`
+          ? this.emailNotification
+            ? `Your answers have been saved, a confirmation email has been sent to your registered email address (${this.userEmail}).`
+            : `Your answers have been saved.`
           : `Submission Result: `,
     });
   };

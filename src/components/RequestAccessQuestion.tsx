@@ -33,6 +33,7 @@ import Options from "./options";
 import Text from "./text";
 import FileUpload from "./fileUpload";
 import CountryList from "./countryList";
+import "../index.css";
 const { Option } = Select;
 const { TextArea } = Input;
 // interface ReturnFileType{
@@ -61,7 +62,12 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
     //console.log(authStore);
     const returnQuestion = (question: RequestAccessQ) => {
       const type = question.questiontype;
-      if (type === "options") return <Options question={question} />;
+      if (type === "options")
+        return (
+          <div className="question">
+            <Options question={question} />
+          </div>
+        );
       else if (type === "fileupload")
         return (
           <FileUpload
@@ -71,9 +77,16 @@ export default class RequestAccessQuestion extends React.Component<RequestAccess
         );
       else if (type === "countrylist")
         return (
-          <CountryList list={authStore!.countryList} question={question} />
+          <div className="question">
+            <CountryList list={authStore!.countryList} question={question} />
+          </div>
         );
-      else return <Text question={question} />;
+      else
+        return (
+          <div className="question">
+            <Text question={question} />
+          </div>
+        );
     };
     return question && returnQuestion(question);
     // question.questiontype === "options" ? (

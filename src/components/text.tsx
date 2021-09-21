@@ -59,7 +59,7 @@ export default class Text extends React.Component<RequestAccessQuestionProps> {
       >
         <TextArea
           rows={4}
-          disabled={authStore?.submitted}
+          disabled={authStore?.submitted || authStore?.hasAnyFileSubmitted}
           maxLength={question.wordlimit || 255}
           showCount
         />

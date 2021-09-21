@@ -65,7 +65,7 @@ export default class CountryList extends React.Component<RequestAccessQuestionPr
           showSearch
           style={{ width: "100%" }}
           allowClear
-          disabled={authStore?.submitted}
+          disabled={authStore?.submitted || authStore?.hasAnyFileSubmitted}
           placeholder="select one country"
           optionLabelProp="label"
         >

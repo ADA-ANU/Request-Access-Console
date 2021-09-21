@@ -67,34 +67,45 @@ export default class RequestAccessForm extends React.Component<
     const { authStore, uploadQIDwithError } = this.props;
     console.log(toJS(authStore?.questions));
     return (
-      <div style={{ margin: "auto", width: "50%", paddingTop: "3vh" }}>
-        <Form
-          id="requestAccess"
-          ref={authStore?.formRef}
-          layout="vertical"
-          size={"large"}
-          scrollToFirstError
-          onFinish={this.handleSubmit}
-          initialValues={authStore?.responseValues}
-        >
-          {authStore?.questions &&
-            authStore.questions.length > 0 &&
-            authStore?.questions.map(
-              (q, index) =>
-                q.hidden === false && (
-                  <div key={index}>
-                    <RequestAccessQuestion
-                      question={q}
-                      key={index}
-                      uploadQIDwithError={uploadQIDwithError}
-                    />
-                  </div>
-                )
-            )}
+      <Row>
+        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={4} />
+        <Col xs={22} sm={20} md={20} lg={18} xl={16} xxl={16}>
+          <div
+            style={{
+              margin: "auto",
+              paddingTop: "3vh",
+            }}
+          >
+            <Form
+              id="requestAccess"
+              ref={authStore?.formRef}
+              layout="vertical"
+              size={"large"}
+              scrollToFirstError
+              onFinish={this.handleSubmit}
+              initialValues={authStore?.responseValues}
+            >
+              {authStore?.questions &&
+                authStore.questions.length > 0 &&
+                authStore?.questions.map(
+                  (q, index) =>
+                    q.hidden === false && (
+                      <div key={index}>
+                        <RequestAccessQuestion
+                          question={q}
+                          key={index}
+                          uploadQIDwithError={uploadQIDwithError}
+                        />
+                      </div>
+                    )
+                )}
 
-          {authStore?.dataFiles && <DataFile />}
-        </Form>
-      </div>
+              {authStore?.dataFiles && <DataFile />}
+            </Form>
+          </div>
+        </Col>
+        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={4} />
+      </Row>
     );
   }
 }

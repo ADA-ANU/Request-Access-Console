@@ -38,6 +38,7 @@ import {
 } from "@ant-design/icons";
 import RequestAccessForm from "../components/RequestAccessForm";
 import Parser from "html-react-parser";
+import { EmailNotification } from "../components/emailNotification";
 const { Title, Text, Paragraph } = Typography;
 const { Header, Content, Footer } = Layout;
 const CheckboxGroup = Checkbox.Group;
@@ -60,6 +61,15 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     if (!param || param === "") {
       this.props.authStore?.unauthorised("No guestbook was found.");
     } else this.props.authStore?.init(param);
+    const notification = localStorage.getItem("ADA_Request_Access");
+    if (
+      notification &&
+      typeof JSON.parse(notification).notification === "boolean"
+    ) {
+      this.props.authStore?.emailNotificationOnChangeWithoutLocalStorage(
+        JSON.parse(notification).notification
+      );
+    }
   }
   submissionCheck = () => {
     console.log("checking");
@@ -107,11 +117,11 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     return (
       // <Spin spinning={siteStore?siteStore.siteLoading : true} tip="Loading...">
       // <Spin spinning={this.props.authStore?.isLoading} tip="Loading...">
-      <Layout style={{ background: "#f0f2f5" }}>
+      <Layout style={{ background: "#f8f7fa" }}>
         <Affix offsetTop={0}>
           <Header
             style={{
-              background: "white",
+              background: "#ffffff",
               width: "100%",
               height: "64px",
               lineHeight: "64px",
@@ -133,13 +143,13 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 <img
                   alt="LOGO"
                   className="logo"
-                  style={{ width: "80%" }}
+                  style={{ width: "18vw" }}
                   src={ADAlogo}
                 />
                 {/*cursor:'pointer' onClick={()=>{history.push('/dashboard/adapt2-new')}}*/}
               </Col>
               <Col
-                xs={{ span: 16, offset: 0 }}
+                xs={{ span: 13, offset: 0 }}
                 sm={{ span: 12, offset: 0 }}
                 md={{ span: 13, offset: 0 }}
                 lg={{ span: 13, offset: 0 }}
@@ -150,145 +160,237 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   style={{
                     textAlign: "center",
                     margin: "auto",
-                    paddingTop: "1%",
+                    //paddingTop: "1%",
                   }}
                 >
-                  <Title level={3}>REQUEST ACCESS MANAGEMENT SYSTEM</Title>
+                  <span
+                    style={{
+                      verticalAlign: "middle",
+                      display: "inline-block",
+                      fontSize: "1.7vw",
+                    }}
+                  >
+                    REQUEST ACCESS MANAGEMENT SYSTEM
+                  </span>
                 </div>
               </Col>
               <Col
-                xs={{ span: 1, offset: 0 }}
-                sm={{ span: 1, offset: 0 }}
-                md={{ span: 1, offset: 1 }}
-                lg={{ span: 1, offset: 1 }}
-                xl={{ span: 1, offset: 1 }}
-                xxl={{ span: 2, offset: 1 }}
+                xs={{ span: 6, offset: 0 }}
+                sm={{ span: 6, offset: 0 }}
+                md={{ span: 5, offset: 1 }}
+                lg={{ span: 4, offset: 2 }}
+                xl={{ span: 4, offset: 2 }}
+                xxl={{ span: 4, offset: 2 }}
               >
-                <div style={{ textAlign: "right" }}>
-                  {/* <Dropdown
+                <Row>
+                  <Col
+                    xs={{ span: 9, offset: 0 }}
+                    sm={{ span: 5, offset: 0 }}
+                    md={{ span: 6, offset: 0 }}
+                    lg={{ span: 6, offset: 0 }}
+                    xl={{ span: 5, offset: 0 }}
+                    xxl={{ span: 6, offset: 2 }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      {/* <Dropdown
                       overlay={menu}
                       trigger={["click"]}
                       placement="bottomCenter"
                     > */}
-                  <Badge count={0}>
-                    <Button
-                      type="primary"
-                      shape="circle"
-                      icon={<UserOutlined />}
-                    />
-                  </Badge>
-                  {/* </Dropdown> */}
-                </div>
+                      <Badge count={0}>
+                        <Button
+                          type="primary"
+                          shape="circle"
+                          icon={<UserOutlined />}
+                        />
+                      </Badge>
+                      {/* </Dropdown> */}
+                    </div>
+                  </Col>
+                  <Col
+                    xs={{ span: 15, offset: 0 }}
+                    sm={{ span: 19, offset: 0 }}
+                    md={{ span: 18, offset: 0 }}
+                    lg={{ span: 18, offset: 0 }}
+                    xl={{ span: 18, offset: 0 }}
+                    xxl={{ span: 16, offset: 0 }}
+                  >
+                    <div
+                      style={{
+                        //paddingLeft: "1vw",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        width: "90%",
+                      }}
+                    >
+                      <span>
+                        {authStore?.userFirstName && authStore.userLastName
+                          ? `${authStore.userFirstName} ${authStore.userLastName}`
+                          : "Guest"}
+                      </span>
+                    </div>
+                  </Col>
+                </Row>
               </Col>
-              <Col
+              {/* <Col
                 xs={{ span: 0, offset: 0 }}
                 sm={{ span: 4, offset: 0 }}
-                md={{ span: 3, offset: 0 }}
-                lg={{ span: 3, offset: 1 }}
-                xl={{ span: 2, offset: 1 }}
+                md={{ span: 4, offset: 0 }}
+                lg={{ span: 3, offset: 0 }}
+                xl={{ span: 3, offset: 0 }}
                 xxl={{ span: 2, offset: 0 }}
               >
-                <div style={{ paddingLeft: "1vw" }}>
-                  <span>
-                    {authStore?.userFirstName && authStore.userLastName
-                      ? `${authStore.userFirstName} ${authStore.userLastName}`
-                      : "Guest"}
-                  </span>
-                </div>
-              </Col>
+                
+              </Col> */}
             </Row>
           </Header>
         </Affix>
-        <Content style={{ padding: "1%", marginBottom: "15vh" }}>
+        <Content
+          style={{
+            //padding: "1%",
+            marginBottom: "6vh",
+            backgroundColor: "#f8f7fa",
+          }}
+        >
           {authStore?.authenticated ? (
             this.props.authStore?.isLoading ? (
               <div style={{ width: "70%", margin: "auto" }}>
                 <Skeleton active title={true} paragraph={{ rows: 20 }} />
               </div>
             ) : (
-              <>
-                <div
-                  style={{
-                    paddingTop: "3vh",
-                    paddingBottom: "3vh",
-                    textAlign: "center",
-                  }}
-                >
-                  <Title level={3}>Dataset: {authStore.datasetTitle}</Title>
-                  <Row justify="center" align="middle">
-                    <Col>
-                      <Title level={4}>Link:</Title>
-                    </Col>
-                    <Col style={{ marginLeft: "1vw", marginBottom: "10px" }}>
-                      <a href={authStore.datasetURL} target="_blank">
-                        {authStore.datasetURL}
-                      </a>
-                    </Col>
-                  </Row>
-                </div>
-                {this.props.authStore?.submitted ? (
-                  <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                    <Row justify="center" gutter={16}>
-                      <Col>
-                        <CheckCircleOutlined
-                          style={{ color: "#007916", fontSize: "3vh" }}
-                        />
-                      </Col>
-                      <Col>
-                        <Title level={4}>This form has been submitted.</Title>
-                      </Col>
-                    </Row>
-                  </div>
-                ) : null}
-                <RequestAccessForm uploadQIDwithError={uploadQIDwithError} />
-                {!authStore.submitted ? (
-                  <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                    <Row>
-                      <Col span={2} offset={9}>
-                        <Button
-                          //form="requestAccess"
-                          key="save"
-                          htmlType="button"
-                          type="primary"
-                          //icon={<PoweroffOutlined />}
-                          loading={authStore.submitting}
-                          onClick={() => authStore!.save()}
-                          disabled={authStore.submitted}
+              <Row>
+                <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={4} />
+                <Col xs={22} sm={22} md={20} lg={18} xl={16} xxl={16}>
+                  <div
+                    style={{
+                      backgroundColor: "#ffffff",
+                      marginTop: "5vh",
+                      //width: "100%",
+                      boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        paddingTop: "3vh",
+                        paddingBottom: "3vh",
+                        textAlign: "center",
+                      }}
+                    >
+                      <Title level={3}>Dataset: {authStore.datasetTitle}</Title>
+                      <Row justify="center" align="middle">
+                        <Col>
+                          <Title level={4}>Link:</Title>
+                        </Col>
+                        <Col
+                          style={{ marginLeft: "1vw", marginBottom: "10px" }}
                         >
-                          Save!
-                        </Button>
-                      </Col>
-                      <Col span={2} offset={2}>
-                        <div>
-                          <Button
-                            form="requestAccess"
-                            key="submit"
-                            //htmlType="submit"
-                            type="primary"
-                            icon={<PoweroffOutlined />}
-                            loading={authStore.submitting}
-                            disabled={
-                              authStore.submitted ||
-                              authStore?.checkedDataFiles.length === 0
-                            }
-                            onClick={() => this.submissionCheck()}
+                          <a href={authStore.datasetURL} target="_blank">
+                            {authStore.datasetURL}
+                          </a>
+                        </Col>
+                      </Row>
+                    </div>
+                    {this.props.authStore?.submitted ? (
+                      <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                        <Row justify="center" gutter={16}>
+                          <Col>
+                            <CheckCircleOutlined
+                              style={{ color: "#007916", fontSize: "3vh" }}
+                            />
+                          </Col>
+                          <Col>
+                            <Title level={4}>
+                              This form has been submitted.
+                            </Title>
+                          </Col>
+                        </Row>
+                      </div>
+                    ) : null}
+                    <RequestAccessForm
+                      uploadQIDwithError={uploadQIDwithError}
+                    />
+                    {!authStore.submitted ? (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          paddingTop: "5vh",
+                          paddingBottom: "4vh",
+                        }}
+                      >
+                        <Row>
+                          <Col
+                            xs={{ span: 7, offset: 0 }}
+                            sm={{ span: 7, offset: 0 }}
+                            md={{ span: 6, offset: 0 }}
+                            lg={{ span: 6, offset: 0 }}
+                            xl={{ span: 6, offset: 0 }}
+                            xxl={{ span: 6, offset: 5 }}
                           >
-                            Submit!
-                          </Button>
-                        </div>
-                      </Col>
-                      <Col span={3}>
-                        {authStore?.validationError && (
-                          <Text type="danger" strong>
-                            You must answer all questions unless they are marked
-                            optional.
-                          </Text>
-                        )}
-                      </Col>
-                    </Row>
+                            <Row>
+                              <Col xxl={{ span: 12, offset: 0 }}>
+                                <EmailNotification
+                                  disabled={authStore.submitted}
+                                  checked={authStore.emailNotification}
+                                  check={authStore.emailNotificationOnChange}
+                                />
+                              </Col>
+                              <Col xxl={{ span: 10, offset: 0 }}>
+                                <Button
+                                  //form="requestAccess"
+                                  key="save"
+                                  htmlType="button"
+                                  type="primary"
+                                  //icon={<PoweroffOutlined />}
+                                  loading={authStore.submitting}
+                                  onClick={() => authStore!.save()}
+                                  disabled={authStore.submitted}
+                                >
+                                  Save!
+                                </Button>
+                              </Col>
+                            </Row>
+                          </Col>
+                          <Col
+                            xs={{ span: 7, offset: 0 }}
+                            sm={{ span: 7, offset: 0 }}
+                            md={{ span: 6, offset: 0 }}
+                            lg={{ span: 6, offset: 0 }}
+                            xl={{ span: 6, offset: 0 }}
+                            xxl={{ span: 5, offset: 0 }}
+                          >
+                            <div>
+                              <Button
+                                form="requestAccess"
+                                key="submit"
+                                //htmlType="submit"
+                                type="primary"
+                                icon={<PoweroffOutlined />}
+                                loading={authStore.submitting}
+                                disabled={
+                                  authStore.submitted ||
+                                  authStore?.checkedDataFiles.length === 0
+                                }
+                                onClick={() => this.submissionCheck()}
+                              >
+                                Submit!
+                              </Button>
+                            </div>
+                          </Col>
+                          <Col span={3}>
+                            {authStore?.validationError && (
+                              <Text type="danger" strong>
+                                You must answer all questions unless they are
+                                marked optional.
+                              </Text>
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </>
+                </Col>
+                <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={4} />
+              </Row>
             )
           ) : (
             <div
@@ -330,39 +432,46 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             paddingTop: "0",
           }}
         >
-          <Row justify="center" style={{ paddingTop: "5vh" }}>
+          <Row justify="center" style={{ paddingTop: "2vh" }}>
             <img
               className="logo"
               style={{
-                height: "64px",
-                lineHeight: "76px",
+                height: "32px",
+                //width: "195px",
+                //lineHeight: "76px",
                 marginTop: "10px",
               }}
               src={ADAlogo}
             />
             <img
               className="logo"
-              style={{ height: "84px", lineHeight: "96px" }}
+              style={{
+                height: "45px",
+                //lineHeight: "96px"
+              }}
               src={Vertical_line}
             />
             <img
               className="logo"
               style={{
-                height: "64px",
-                lineHeight: "76px",
+                height: "32px",
+                //lineHeight: "76px",
                 marginTop: "10px",
               }}
               src={ANUlogo}
             />
             <img
               className="logo"
-              style={{ height: "84px", lineHeight: "76px" }}
+              style={{
+                height: "45px",
+                //, lineHeight: "76px"
+              }}
               src={Vertical_line}
             />
             <img
               className="logo"
               style={{
-                height: "64px",
+                height: "32px",
                 lineHeight: "76px",
                 marginTop: "10px",
               }}
@@ -517,23 +626,28 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
           >
             {authStore?.submissionResult &&
             authStore.submissionResult.length > 0 ? (
-              <ol>
-                {authStore.submissionResult.map((result, index) => (
-                  <li
-                    key={index}
-                    style={{
-                      color: result.status === "ERROR" ? "#ff4d4f" : "black",
-                      fontSize: "16px",
-                    }}
-                  >
-                    {`${
-                      authStore?.dataFiles.find(
-                        (ele) => ele.id === result.datafileID
-                      )?.label
-                    } (${result.datafileID}): ${result.msg}`}
-                  </li>
-                ))}
-              </ol>
+              <div>
+                <Text strong style={{ paddingLeft: "22px" }}>
+                  Ticket Number: {authStore.ticketID}
+                </Text>
+                <ol style={{ marginTop: "2vh" }}>
+                  {authStore.submissionResult.map((result, index) => (
+                    <li
+                      key={index}
+                      style={{
+                        color: result.status === "ERROR" ? "#ff4d4f" : "black",
+                        fontSize: "16px",
+                      }}
+                    >
+                      {`${
+                        authStore?.dataFiles.find(
+                          (ele) => ele.id === result.datafileID
+                        )?.label
+                      }: ${result.msg}`}
+                    </li>
+                  ))}
+                </ol>
+              </div>
             ) : null}
             <Row justify="center" style={{ paddingTop: "4vh" }}>
               <Button

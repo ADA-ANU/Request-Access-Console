@@ -48,6 +48,8 @@ export interface dataFiles {
   assigneeidentifier: number;
   value: number;
   disabled: boolean;
+  description: string;
+  tags: string[];
 }
 export interface ResultType {
   type: "save" | "submit";
