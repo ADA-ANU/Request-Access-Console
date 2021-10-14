@@ -12,7 +12,7 @@ import {
   Typography,
   Alert,
   Spin,
-  Form,
+  Anchor,
   Row,
   Badge,
   Tooltip,
@@ -39,9 +39,14 @@ import {
 import RequestAccessForm from "../components/RequestAccessForm";
 import Parser from "html-react-parser";
 import { EmailNotification } from "../components/emailNotification";
+import DataFile from "../components/dataFile";
+import SiblingDatasets from "../components/siblingDatasets";
+import "../App.css";
+import { datafile } from "../stores/data";
 const { Title, Text, Paragraph } = Typography;
 const { Header, Content, Footer } = Layout;
 const CheckboxGroup = Checkbox.Group;
+//const { Link as AnchorLink } = Anchor;
 
 export interface IMainFrameProps extends IRoutingProps {
   systemStore?: SystemStore;
@@ -71,6 +76,9 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
       );
     }
   }
+  handleAnchorClick = (e: any) => {
+    e.preventDefault();
+  };
   submissionCheck = () => {
     console.log("checking");
     // let qidWithError: number[] = [];
@@ -96,6 +104,24 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     this.props.authStore?.confirmModal();
     //}
   };
+
+  findDatafile = (datafileID: number) => {
+    const datafile_originalRequest = this.props.authStore?.dataFiles.find(
+      (ele) => ele.id === datafileID
+    );
+    if (datafile_originalRequest) return datafile_originalRequest.label;
+
+    const datafile_sibling = this.props.authStore?.siblingDatasets.reduce(
+      (prev, dataset) =>
+        // @ts-ignore
+        prev || dataset.datafiles.find((df) => df.id === datafileID),
+      undefined
+    );
+    // @ts-ignore
+    if (datafile_sibling) return datafile_sibling.label;
+    return "Not found";
+  };
+
   render() {
     let { systemStore, routingStore, authStore } = this.props;
     const { uploadQIDwithError } = this.state;
@@ -182,14 +208,14 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 xl={{ span: 4, offset: 2 }}
                 xxl={{ span: 4, offset: 2 }}
               >
-                <Row>
+                <Row style={{ display: "flex" }}>
                   <Col
                     xs={{ span: 9, offset: 0 }}
                     sm={{ span: 5, offset: 0 }}
                     md={{ span: 6, offset: 0 }}
                     lg={{ span: 6, offset: 0 }}
                     xl={{ span: 5, offset: 0 }}
-                    xxl={{ span: 6, offset: 2 }}
+                    xxl={{ span: 4, offset: 3 }}
                   >
                     <div style={{ textAlign: "center" }}>
                       {/* <Dropdown
@@ -217,17 +243,17 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                   >
                     <div
                       style={{
-                        //paddingLeft: "1vw",
+                        paddingLeft: "5px",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        //height: "50px",
                         width: "90%",
                       }}
                     >
-                      <span>
-                        {authStore?.userFirstName && authStore.userLastName
-                          ? `${authStore.userFirstName} ${authStore.userLastName}`
-                          : "Guest"}
-                      </span>
+                      {authStore?.userFirstName && authStore.userLastName
+                        ? `${authStore.userFirstName} ${authStore.userLastName}`
+                        : "Guest"}
                     </div>
                   </Col>
                 </Row>
@@ -248,6 +274,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
         <Content
           style={{
             //padding: "1%",
+
             marginBottom: "6vh",
             backgroundColor: "#f8f7fa",
           }}
@@ -258,59 +285,122 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 <Skeleton active title={true} paragraph={{ rows: 20 }} />
               </div>
             ) : (
-              <Row>
-                <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={4} />
-                <Col xs={22} sm={22} md={20} lg={18} xl={16} xxl={16}>
-                  <div
-                    style={{
-                      backgroundColor: "#ffffff",
-                      marginTop: "5vh",
-                      //width: "100%",
-                      boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
-                    }}
-                  >
+              <>
+                <Row>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6}>
+                    <Anchor
+                      onClick={this.handleAnchorClick}
+                      offsetTop={150}
+                      style={{ paddingLeft: "1vw" }}
+                      className="hidden-xs hidden-sm"
+                    >
+                      <Anchor.Link href="#guestbook" title="Guestbook" />
+                      <Anchor.Link href="#datasetFiles" title="Datafiles" />
+                      <Anchor.Link
+                        href="#siblingDatasets"
+                        title="Sibling Datasets"
+                      />
+                      {!authStore.submitted && (
+                        <Anchor.Link href="#submit" title="Save/Submit" />
+                      )}
+                    </Anchor>
+                  </Col>
+                  <Col xs={22} sm={22} md={16} lg={18} xl={16} xxl={12}>
                     <div
                       style={{
-                        paddingTop: "3vh",
-                        paddingBottom: "3vh",
-                        textAlign: "center",
+                        borderRadius: "20px",
+                        backgroundColor: "#ffffff",
+                        marginTop: "5vh",
+                        //width: "100%",
+                        boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
                       }}
                     >
-                      <Title level={3}>Dataset: {authStore.datasetTitle}</Title>
-                      <Row justify="center" align="middle">
-                        <Col>
-                          <Title level={4}>Link:</Title>
-                        </Col>
-                        <Col
-                          style={{ marginLeft: "1vw", marginBottom: "10px" }}
-                        >
-                          <a href={authStore.datasetURL} target="_blank">
-                            {authStore.datasetURL}
-                          </a>
-                        </Col>
-                      </Row>
-                    </div>
-                    {this.props.authStore?.submitted ? (
-                      <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-                        <Row justify="center" gutter={16}>
+                      <div
+                        style={{
+                          paddingTop: "3vh",
+                          paddingBottom: "3vh",
+                          textAlign: "center",
+                        }}
+                      >
+                        <Title level={3}>
+                          Dataset: {authStore.datasetTitle}
+                        </Title>
+                        <Row justify="center" align="middle">
                           <Col>
-                            <CheckCircleOutlined
-                              style={{ color: "#007916", fontSize: "3vh" }}
-                            />
+                            <Title level={4}>Link:</Title>
                           </Col>
-                          <Col>
-                            <Title level={4}>
-                              This form has been submitted.
-                            </Title>
+                          <Col
+                            style={{ marginLeft: "1vw", marginBottom: "10px" }}
+                          >
+                            <a href={authStore.datasetURL} target="_blank">
+                              {authStore.datasetURL}
+                            </a>
                           </Col>
                         </Row>
                       </div>
-                    ) : null}
-                    <RequestAccessForm
-                      uploadQIDwithError={uploadQIDwithError}
-                    />
+                      {this.props.authStore?.submitted ? (
+                        <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                          <Row justify="center" gutter={16}>
+                            <Col>
+                              <CheckCircleOutlined
+                                style={{ color: "#007916", fontSize: "3vh" }}
+                              />
+                            </Col>
+                            <Col>
+                              <Title level={4}>
+                                This form has been submitted.
+                              </Title>
+                            </Col>
+                          </Row>
+                        </div>
+                      ) : null}
+                      <RequestAccessForm
+                        uploadQIDwithError={uploadQIDwithError}
+                      />
+                    </div>
+                  </Col>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                </Row>
+                <Row>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                  <Col xs={22} sm={22} md={16} lg={18} xl={16} xxl={12}>
+                    <div
+                      style={{
+                        borderRadius: "20px",
+                        backgroundColor: "#ffffff",
+                        marginTop: "5vh",
+                        //width: "100%",
+                        boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
+                      }}
+                    >
+                      {authStore?.dataFiles && <DataFile />}
+                    </div>
+                  </Col>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                </Row>
+                <Row>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                  <Col xs={22} sm={22} md={16} lg={18} xl={16} xxl={12}>
+                    <div
+                      style={{
+                        borderRadius: "20px",
+                        backgroundColor: "#ffffff",
+                        marginTop: "5vh",
+                        //width: "100%",
+                        boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
+                      }}
+                    >
+                      {authStore?.dataFiles && <SiblingDatasets />}
+                    </div>
+                  </Col>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                </Row>
+                <Row>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                  <Col xs={22} sm={22} md={16} lg={18} xl={16} xxl={12}>
                     {!authStore.submitted ? (
                       <div
+                        id="submit"
                         style={{
                           textAlign: "center",
                           paddingTop: "5vh",
@@ -319,44 +409,49 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                       >
                         <Row>
                           <Col
-                            xs={{ span: 7, offset: 0 }}
-                            sm={{ span: 7, offset: 0 }}
-                            md={{ span: 6, offset: 0 }}
-                            lg={{ span: 6, offset: 0 }}
-                            xl={{ span: 6, offset: 0 }}
-                            xxl={{ span: 6, offset: 5 }}
+                            xs={{ span: 8, offset: 0 }}
+                            sm={{ span: 8, offset: 0 }}
+                            md={{ span: 7, offset: 1 }}
+                            lg={{ span: 6, offset: 2 }}
+                            xl={{ span: 5, offset: 4 }}
+                            xxl={{ span: 7, offset: 2 }}
                           >
-                            <Row>
-                              <Col xxl={{ span: 12, offset: 0 }}>
-                                <EmailNotification
-                                  disabled={authStore.submitted}
-                                  checked={authStore.emailNotification}
-                                  check={authStore.emailNotificationOnChange}
-                                />
-                              </Col>
-                              <Col xxl={{ span: 10, offset: 0 }}>
-                                <Button
-                                  //form="requestAccess"
-                                  key="save"
-                                  htmlType="button"
-                                  type="primary"
-                                  //icon={<PoweroffOutlined />}
-                                  loading={authStore.submitting}
-                                  onClick={() => authStore!.save()}
-                                  disabled={authStore.submitted}
-                                >
-                                  Save!
-                                </Button>
-                              </Col>
-                            </Row>
+                            <EmailNotification
+                              disabled={authStore.submitted}
+                              checked={authStore.emailNotification}
+                              check={authStore.emailNotificationOnChange}
+                            />
                           </Col>
+
                           <Col
-                            xs={{ span: 7, offset: 0 }}
-                            sm={{ span: 7, offset: 0 }}
-                            md={{ span: 6, offset: 0 }}
-                            lg={{ span: 6, offset: 0 }}
-                            xl={{ span: 6, offset: 0 }}
-                            xxl={{ span: 5, offset: 0 }}
+                            xs={{ span: 3, offset: 0 }}
+                            sm={{ span: 3, offset: 0 }}
+                            md={{ span: 3, offset: 0 }}
+                            lg={{ span: 2, offset: 0 }}
+                            xl={{ span: 2, offset: 0 }}
+                            xxl={{ span: 1, offset: 0 }}
+                          >
+                            <Button
+                              //form="requestAccess"
+                              key="save"
+                              htmlType="button"
+                              type="primary"
+                              //icon={<PoweroffOutlined />}
+                              loading={authStore.submitting}
+                              onClick={() => authStore!.save()}
+                              disabled={authStore.submitted}
+                            >
+                              Save!
+                            </Button>
+                          </Col>
+
+                          <Col
+                            xs={{ span: 4, offset: 2 }}
+                            sm={{ span: 4, offset: 2 }}
+                            md={{ span: 5, offset: 2 }}
+                            lg={{ span: 3, offset: 2 }}
+                            xl={{ span: 2, offset: 2 }}
+                            xxl={{ span: 2, offset: 3 }}
                           >
                             <div>
                               <Button
@@ -368,7 +463,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                                 loading={authStore.submitting}
                                 disabled={
                                   authStore.submitted ||
-                                  authStore?.checkedDataFiles.length === 0
+                                  authStore?.checkedDataFiles.size === 0
                                 }
                                 onClick={() => this.submissionCheck()}
                               >
@@ -387,10 +482,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                         </Row>
                       </div>
                     ) : null}
-                  </div>
-                </Col>
-                <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={4} />
-              </Row>
+                  </Col>
+                  <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
+                </Row>
+              </>
             )
           ) : (
             <div
@@ -639,11 +734,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                         fontSize: "16px",
                       }}
                     >
-                      {`${
-                        authStore?.dataFiles.find(
-                          (ele) => ele.id === result.datafileID
-                        )?.label
-                      }: ${result.msg}`}
+                      {`${this.findDatafile(result.datafileID)}: ${result.msg}`}
                     </li>
                   ))}
                 </ol>

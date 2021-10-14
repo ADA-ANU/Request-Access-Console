@@ -68,9 +68,10 @@ export default class RequestAccessForm extends React.Component<
     console.log(toJS(authStore?.questions));
     return (
       <Row>
-        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={4} />
-        <Col xs={22} sm={20} md={20} lg={18} xl={16} xxl={16}>
+        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={2} />
+        <Col xs={22} sm={20} md={20} lg={18} xl={16} xxl={20}>
           <div
+            id="guestbook"
             style={{
               margin: "auto",
               paddingTop: "3vh",
@@ -99,12 +100,10 @@ export default class RequestAccessForm extends React.Component<
                       </div>
                     )
                 )}
-
-              {authStore?.dataFiles && <DataFile />}
             </Form>
           </div>
         </Col>
-        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={4} />
+        <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={2} />
       </Row>
     );
   }

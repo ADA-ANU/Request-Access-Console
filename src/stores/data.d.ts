@@ -51,6 +51,24 @@ export interface dataFiles {
   description: string;
   tags: string[];
 }
+
+export interface siblingDataset {
+  id: number;
+  owner_id: number;
+  owner_name: string;
+  dataset_title: string;
+  datafiles: datafile[];
+}
+
+export interface datafile {
+  id: number;
+  tags: string[];
+  label: string;
+  restricted: boolean;
+  description: string;
+  assigneeidentifier: string | null;
+  authenticated_user_id: number | null;
+}
 export interface ResultType {
   type: "save" | "submit";
 }

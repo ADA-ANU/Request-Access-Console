@@ -13,7 +13,12 @@ import {
   convertCompilerOptionsFromJson,
   textChangeRangeIsUnchanged,
 } from "typescript";
-import { ResultType, dataFiles, submissionResult } from "../stores/data.d";
+import {
+  ResultType,
+  dataFiles,
+  submissionResult,
+  siblingDataset,
+} from "../stores/data.d";
 import { file } from "jszip";
 import { RcFile } from "antd/lib/upload";
 import { CheckboxChangeEvent } from "../../node_modules/antd/es/checkbox";
@@ -29,7 +34,9 @@ export class AuthStore {
   @observable emailNotification: boolean = true;
   @observable datasetURL: string | undefined;
   @observable result: boolean = false;
+  @observable datasetID_orginalRequest: number | undefined;
   @observable questions?: Array<RequestAccessQ>;
+  @observable siblingDatasets: Array<siblingDataset> = [];
   @observable userid: number | undefined;
   @observable userFirstName: string | undefined;
   @observable userLastName: string | undefined;
@@ -49,7 +56,7 @@ export class AuthStore {
   @observable token: string | undefined;
   @observable authenticated: boolean = true;
   @observable errorMsg: string | undefined;
-  @observable checkedDataFiles: Array<number> = [];
+  @observable checkedDataFiles: Map<any, any> = new Map();
   @observable inputCheckedDataFiles: Array<number> = [];
   @observable checkall: boolean = false;
   @observable indeterminate: boolean = true;
@@ -106,6 +113,8 @@ export class AuthStore {
             // console.log(json.info, json.submitted);
             //console.log(json.terms);
             this.datasetURL = json.datasetURL;
+            this.siblingDatasets = json.siblingDatasets;
+            this.datasetID_orginalRequest = Number(json.info.dataset_id);
             const dfs = json.dataFiles.map((d: any) => {
               d["value"] = d.id;
               if (
@@ -116,12 +125,24 @@ export class AuthStore {
               } else {
                 d.disabled = false;
               }
-              if (d.restricted && !d.disabled) this.checkedDataFiles.push(d.id);
-              if (d.assigneeidentifier) d.label += " (Approved)";
-              if (d.authenticated_user_id) {
-                d.label += " (Requested)";
-                this.hasAnyFileSubmitted = true;
-              }
+              // if (d.restricted && !d.disabled)
+              //   this.checkedDataFiles.set(
+              //     Number(json.info.dataset_id),
+              //     this.checkedDataFiles.get(Number(json.info.dataset_id))
+              //       ? [
+              //           ...this.checkedDataFiles.get(
+              //             Number(json.info.dataset_id)
+              //           ),
+              //           d.id,
+              //         ]
+              //       : [d.id]
+              //   );
+
+              // if (d.assigneeidentifier) d.label += " (Approved)";
+              // if (d.authenticated_user_id) {
+              //   d.label += " (Requested)";
+              //   this.hasAnyFileSubmitted = true;
+              // }
               //if (json.info.inputDataFileIDs.includes(d.id)) d.disabled = true;
               return d;
             });
@@ -132,6 +153,7 @@ export class AuthStore {
             //this.checkedDataFiles = json.info.inputDataFileIDs;
             this.dataFiles = dfs;
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
+            this.onChange(json.info.inputDataFileIDs);
             this.userEmail = json.info.email;
             console.log(json.responseValues);
             //json.responseValues[755] = undefined;
@@ -155,7 +177,7 @@ export class AuthStore {
             this.userid = userid;
             this.datasetTitle = dataset_title;
             this.doi = DOI;
-            this.submitted = json.submitted.length > 0;
+            this.submitted = json.submitted;
             console.log(json.submittedFileIDs);
             this.submittedFileIDs = json.submittedFileIDs;
             this.unrestrictedFileIDs = json.unrestrictedFileIDs;
@@ -181,8 +203,10 @@ export class AuthStore {
           } else {
             console.log("777", error.data ? error.data : error);
             this.unauthorised(
-              error.data && error.data.msg
+              error.data
                 ? error.data.msg
+                  ? error.data.msg
+                  : error.data
                 : "Server error, please try again."
             );
             //this.openNotification(error.data);
@@ -268,6 +292,7 @@ export class AuthStore {
   @action submit(values: { [k: number]: any }) {
     this.submitting = true;
     console.log(values);
+
     //this.handleModal(false);
     if (
       this.termsCheckboxValues.sort().join(",") !==
@@ -284,11 +309,15 @@ export class AuthStore {
         values[q.questionid] = null;
       }
     }
+
+    let ids: any = [];
+    this.checkedDataFiles.forEach((value) => ids.push([...value]));
+    const checkedDatafileIDs = ids.flat();
     apiagent
       .post(API_URL.SUBMITRESPONSES, {
         token: this.token,
         responses: values,
-        checkedDataFiles: this.checkedDataFiles,
+        checkedDataFiles: checkedDatafileIDs,
       })
       .then(
         action((json) => {
@@ -339,7 +368,9 @@ export class AuthStore {
           .post(API_URL.SAVERESPONSES, {
             token: this.token,
             responses: values,
-            checkedDataFiles: this.checkedDataFiles,
+            checkedDataFiles: this.checkedDataFiles.get(
+              this.datasetID_orginalRequest
+            ),
             emailNotification: this.emailNotification,
           })
           .then(
@@ -379,7 +410,7 @@ export class AuthStore {
     console.log(list);
     //console.log(this.submittedFileIDs.length);
     console.log(this.dataFiles.length);
-    this.checkedDataFiles = list;
+    this.checkedDataFiles.set(this.datasetID_orginalRequest, list);
     this.indeterminate =
       !!list.length &&
       list.length <
@@ -392,34 +423,48 @@ export class AuthStore {
         this.submittedFileIDs.length -
         this.unrestrictedFileIDs.length;
   };
-  @action individualOnChange = (e: any, fileID: number) => {
+  @action individualOnChange = (e: any, fileID: number, datasetID: number) => {
     console.log(e, fileID);
     if (e.target.checked) {
-      if (!this.checkedDataFiles.includes(fileID)) {
+      if (!this.checkedDataFiles.get(datasetID).includes(fileID)) {
         const checkedList = [...this.checkedDataFiles, fileID];
         console.log(checkedList);
-        this.checkedDataFiles = checkedList;
+        this.checkedDataFiles.set(datasetID, checkedList);
         this.indeterminate =
           !!checkedList.length && checkedList.length < this.dataFiles.length;
         this.checkall = checkedList.length === this.dataFiles.length;
       }
     } else {
       const checkedList = [
-        ...this.checkedDataFiles.filter((item) => item !== fileID),
+        ...this.checkedDataFiles
+          .get(datasetID)
+          .filter((item: any) => item !== fileID),
       ];
       console.log(checkedList);
-      this.checkedDataFiles = checkedList;
+      this.checkedDataFiles.set(datasetID, checkedList);
       this.indeterminate =
         !!checkedList.length && checkedList.length < this.dataFiles.length;
       this.checkall = checkedList.length === this.dataFiles.length;
     }
   };
   @action onCheckAllChange = (e: any) => {
-    this.checkedDataFiles = this.sortChcked(e.target.checked);
+    this.checkedDataFiles.set(
+      this.datasetID_orginalRequest,
+      this.sortChcked(e.target.checked)
+    );
     console.log(this.checkedDataFiles);
     this.indeterminate = false;
     this.checkall = e.target.checked;
   };
+
+  @action siblingCheckAllOnChange(datasetID: number, datafileIDs: number[]) {
+    if (datafileIDs.length > 0) {
+      this.checkedDataFiles.set(Number(datasetID), datafileIDs);
+      //console.log(this.checkedDataFiles.get(Number(datasetID)));
+    } else {
+      this.checkedDataFiles.delete(Number(datasetID));
+    }
+  }
   @action termsOnchange = (list: any) => {
     console.log(list);
     this.termsCheckboxValues = list;
