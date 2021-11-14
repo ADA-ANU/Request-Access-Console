@@ -113,7 +113,7 @@ const SiblingDataset = ({
                       submitted
                     }
                   >
-                    <div key={file.label} style={{ marginBottom: "1vh" }}>
+                    <div key={file.id} style={{ marginBottom: "1vh" }}>
                       {file.label}
                     </div>
                     {file.description && (
