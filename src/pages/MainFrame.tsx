@@ -64,7 +64,9 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     const param = pathname?.split("/")[1];
     //console.log(param);
     if (!param || param === "") {
-      this.props.authStore?.unauthorised("No guestbook was found.");
+      this.props.authStore?.unauthorised(
+        `Please access this application through https://dataverse.ada.edu.au`
+      );
     } else this.props.authStore?.init(param);
     const notification = localStorage.getItem("ADA_Request_Access");
     if (
@@ -120,6 +122,25 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     // @ts-ignore
     if (datafile_sibling) return datafile_sibling.label;
     return "Not found";
+  };
+
+  urlify = (text: string) => {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    const url = text.match(urlRegex) ? text.match(urlRegex)![0] : undefined;
+    console.log(130, text.match(urlRegex), url);
+    if (url) {
+      const textWithoutURL = text.replace(urlRegex, (url) => "");
+      return (
+        <div>
+          {textWithoutURL} <a href={url}>{url}</a>
+        </div>
+      );
+    } else return text;
+    // return text.replace(urlRegex, function (url: string) {
+    //   return `<a href="' + url + '">' + {url} + "</a>`;
+    // });
+    // or alternatively
+    // return text.replace(urlRegex, '<a href="$1">$1</a>')
   };
 
   render() {
@@ -505,7 +526,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 }}
                 src={warningLogo}
               />
-              <Title level={3}>{authStore?.errorMsg}</Title>
+              <Title level={3}>{this.urlify(authStore?.errorMsg!)}</Title>
             </div>
           )}
 
