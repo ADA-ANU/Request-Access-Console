@@ -136,7 +136,10 @@ export default class DataFile extends React.Component<DataFileProps> {
               {authStore?.dataFiles.map(
                 (file, index) =>
                   !file.restricted && (
-                    <li key={`${file.id}-${index}`}>
+                    <li
+                      key={`${file.id}-${index}`}
+                      style={{ marginBottom: "2vh" }}
+                    >
                       <div key={file.label} style={{ marginBottom: "1vh" }}>
                         {file.label}
                       </div>

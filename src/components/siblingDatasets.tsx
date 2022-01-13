@@ -65,27 +65,31 @@ export default class SiblingDatasets extends React.Component<SiblingDatasetsProp
               paddingTop: "4vh",
               //display: "block",
               marginRight: 10,
-              width: "80%",
+              width: "100%",
             }}
           >
-            {authStore!.siblingDatasets!.length > 0 &&
-              authStore!.siblingDatasets!.map((dataset: siblingDataset) => (
-                <SiblingDataset
-                  key={dataset.id}
-                  dataset={dataset}
-                  authStore={this.props.authStore}
-                  checkedDataFiles={authStore?.checkedDataFiles.get(
-                    Number(dataset.id)
-                  )}
-                  siblingCheckAllOnChange={(
-                    datasetID: number,
-                    datafileIDs: number[]
-                  ) =>
-                    authStore!.siblingCheckAllOnChange(datasetID, datafileIDs)
-                  }
-                  submitted={authStore!.submitted}
-                />
-              ))}
+            {authStore!.siblingDatasets &&
+              authStore!.siblingDatasets.length > 0 &&
+              authStore!.siblingDatasets!.map(
+                (dataset: siblingDataset, idx: number) => (
+                  <SiblingDataset
+                    key={dataset.id}
+                    dataset={dataset}
+                    authStore={this.props.authStore}
+                    isLastItem={idx === authStore!.siblingDatasets.length - 1}
+                    checkedDataFiles={authStore?.checkedDataFiles.get(
+                      Number(dataset.id)
+                    )}
+                    siblingCheckAllOnChange={(
+                      datasetID: number,
+                      datafileIDs: number[]
+                    ) =>
+                      authStore!.siblingCheckAllOnChange(datasetID, datafileIDs)
+                    }
+                    submitted={authStore!.submitted}
+                  />
+                )
+              )}
           </div>
         </Col>
         <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={2} />

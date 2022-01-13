@@ -10,6 +10,7 @@ const { Title, Text } = Typography;
 interface sibling {
   dataset: siblingDataset;
   authStore?: AuthStore;
+  isLastItem: boolean;
   checkedDataFiles?: [];
   siblingCheckAllOnChange: Function;
   submitted: boolean;
@@ -20,10 +21,11 @@ const SiblingDataset = ({
   checkedDataFiles,
   siblingCheckAllOnChange,
   submitted,
+  isLastItem,
 }: sibling) => {
   const [selectAllChecked, toggleSelectAll] = useState(false);
   const [indeterminate, toggleIndeterminate] = useState(false);
-  console.log(dataset.id, submitted);
+  console.log(dataset, submitted);
 
   const getAllowedToBeCheckedDatafileID = () => {
     const datafileID_allowedToBeChecked = dataset.datafiles
@@ -73,9 +75,13 @@ const SiblingDataset = ({
     () => (
       <>
         <div style={{ display: "flex" }}>
-          <Title level={5}>{dataset.dataset_title}</Title>
+          <Title level={5} style={{ width: "85%" }}>
+            <a href={dataset.url} target="_blank">
+              {dataset.dataset_title}
+            </a>
+          </Title>
           <Checkbox
-            style={{ marginLeft: "2vw" }}
+            style={{ marginLeft: "1vw" }}
             indeterminate={indeterminate}
             onChange={selectAllOnChange}
             checked={selectAllChecked}
@@ -137,7 +143,7 @@ const SiblingDataset = ({
               )
           )}
         </CheckboxGroup>
-        <Divider />
+        {!isLastItem && <Divider />}
       </>
     ),
     [checkedDataFiles, submitted]

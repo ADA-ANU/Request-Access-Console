@@ -58,6 +58,7 @@ export interface siblingDataset {
   owner_name: string;
   dataset_title: string;
   datafiles: datafile[];
+  url: string;
 }
 
 export interface datafile {
