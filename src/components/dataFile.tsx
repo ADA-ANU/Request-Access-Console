@@ -99,7 +99,7 @@ export default class DataFile extends React.Component<DataFileProps> {
                         value={file.id}
                         disabled={this.checkDisable(file)}
                       >
-                        <div key={file.label} style={{ marginBottom: "1vh" }}>
+                        <div key={file.id} style={{ marginBottom: "1vh" }}>
                           {file.label}
                         </div>
                         <div key={file.description}>

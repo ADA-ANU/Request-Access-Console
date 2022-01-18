@@ -126,6 +126,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
 
   urlify = (text: string) => {
     var urlRegex = /(https?:\/\/[^\s]+)/g;
+    if (!text) return "";
     const url = text.match(urlRegex) ? text.match(urlRegex)![0] : undefined;
     console.log(130, text.match(urlRegex), url);
     if (url) {
