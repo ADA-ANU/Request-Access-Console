@@ -94,7 +94,7 @@ const SiblingDataset = ({
           //options={authStore?.dataFiles}
           value={checkedDataFiles}
           onChange={selectOnChange}
-          style={{ display: "flex", flexWrap: "wrap" }}
+          style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}
         >
           {dataset.datafiles.map(
             (file) =>
@@ -105,7 +105,7 @@ const SiblingDataset = ({
                 <div
                   key={file.id}
                   style={{
-                    marginBottom: "5vh",
+                    marginBottom: "4vh",
                     marginRight: "1vw",
                   }}
                 >

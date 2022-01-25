@@ -29,6 +29,7 @@ export class AuthStore {
   @observable isLoading: boolean = false;
   @observable submitting: boolean = false;
   @observable submitted: boolean = false;
+  @observable hasError: boolean = false;
   @observable hasAnyFileSubmitted: boolean = false;
   @observable validationError: boolean = false;
   @observable emailNotification: boolean = true;
@@ -69,7 +70,7 @@ export class AuthStore {
     "I accept the Terms of Use.",
   ];
   @observable termsCheckboxValues: Array<string> = [];
-  @observable submissionResult: Array<submissionResult> = [];
+  @observable submissionResult: submissionResult | undefined;
   @observable ticketID: number | undefined;
   constructor() {
     this.initApp();
@@ -326,14 +327,13 @@ export class AuthStore {
           //   json.some((ele: any) => ele.status === "ERROR"),
           //   json.some((ele: any) => ele.status === "ERROR") ? false : true
           // );
-          const { result, ticketID } = json;
-          this.submitted = result.some((ele: any) => ele.status === "ERROR")
-            ? false
-            : true;
+          const { data, hasError } = json;
+          this.submitted = hasError;
+          this.hasError = hasError;
           console.log(this.submitted);
           this.showResultModal = true;
-          this.submissionResult = result;
-          this.ticketID = ticketID;
+          this.submissionResult = json;
+          //this.ticketID = ticketID;
           //this.resultModal("submit");
         })
       )

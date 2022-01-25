@@ -35,11 +35,21 @@ export interface uploadFile {
   originalname: string;
 }
 export interface submissionResult {
-  datafileID: number;
-  status: string;
-  msg: string;
+  data: result[];
+  hasError: boolean;
 }
 
+export interface result {
+  result: requestResult[];
+  ticketID: number;
+  datasetTitle: string;
+}
+
+export interface requestResult {
+  datafileID: number;
+  msg: string;
+  status: string;
+}
 export interface dataFiles {
   id: number;
   label: string;

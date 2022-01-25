@@ -144,6 +144,13 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     // return text.replace(urlRegex, '<a href="$1">$1</a>')
   };
 
+  handleSubmit = () => {
+    const values = authStore?.formRef.current?.getFieldsValue();
+    console.log("Received values of form: ", values);
+
+    this.props.authStore?.submit(values);
+  };
+
   render() {
     let { systemStore, routingStore, authStore } = this.props;
     const { uploadQIDwithError } = this.state;
@@ -479,7 +486,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                               <Button
                                 form="requestAccess"
                                 key="submit"
-                                //htmlType="submit"
+                                htmlType="submit"
                                 type="primary"
                                 icon={<PoweroffOutlined />}
                                 loading={authStore.submitting}
@@ -494,12 +501,12 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                             </div>
                           </Col>
                           <Col span={3}>
-                            {authStore?.validationError && (
+                            {/* {authStore?.validationError && (
                               <Text type="danger" strong>
                                 You must answer all questions unless they are
                                 marked optional.
                               </Text>
-                            )}
+                            )} */}
                           </Col>
                         </Row>
                       </div>
@@ -690,10 +697,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 <Button
                   form="requestAccess"
                   key="submit"
-                  htmlType="submit"
+                  //htmlType="submit"
                   type="primary"
                   loading={authStore?.submitting}
-                  //onClick={() => authStore.handleModal(false)}
+                  onClick={this.handleSubmit}
                   disabled={
                     authStore?.termsCheckboxValues.length !== 2 ||
                     authStore.termsCheckboxValues.sort().join(",") !==
@@ -707,9 +714,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
           </Modal>
           <Modal
             title={
-              authStore?.submissionResult.some(
-                (ele) => ele.status === "ERROR"
-              ) ? (
+              authStore?.hasError ? (
                 <Row>
                   <Col span={2} offset={1}>
                     <ExclamationCircleOutlined
@@ -741,27 +746,35 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             onCancel={() => authStore?.handleResultModal(false)}
             footer={null}
           >
-            {authStore?.submissionResult &&
-            authStore.submissionResult.length > 0 ? (
+            {console.log(749, authStore?.submissionResult)}
+            {authStore?.submissionResult?.data && (
               <div>
-                <Text strong style={{ paddingLeft: "22px" }}>
-                  Ticket Number: {authStore.ticketID}
-                </Text>
-                <ol style={{ marginTop: "2vh" }}>
-                  {authStore.submissionResult.map((result, index) => (
-                    <li
-                      key={index}
-                      style={{
-                        color: result.status === "ERROR" ? "#ff4d4f" : "black",
-                        fontSize: "16px",
-                      }}
-                    >
-                      {`${this.findDatafile(result.datafileID)}: ${result.msg}`}
-                    </li>
-                  ))}
-                </ol>
+                {authStore.submissionResult.data.map((result, index) => (
+                  <>
+                    <Text strong style={{ paddingLeft: "22px" }}>
+                      {result.datasetTitle}
+                    </Text>
+                    <Text strong style={{ paddingLeft: "22px" }}>
+                      Ticket Number: {result.ticketID}
+                    </Text>
+                    <ol style={{ marginTop: "2vh" }}>
+                      {result.result.map((file: any, index: number) => (
+                        <li
+                          key={index}
+                          style={{
+                            color:
+                              file.status === "ERROR" ? "#ff4d4f" : "black",
+                            fontSize: "16px",
+                          }}
+                        >
+                          {`${file.msg}`}
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                ))}
               </div>
-            ) : null}
+            )}
             <Row justify="center" style={{ paddingTop: "4vh" }}>
               <Button
                 key="OK"
