@@ -44,7 +44,6 @@ export default class DataFile extends React.Component<DataFileProps> {
   };
   render() {
     const { authStore } = this.props;
-    console.log(authStore?.submitted);
     return (
       <Row>
         <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={2} />
@@ -121,44 +120,57 @@ export default class DataFile extends React.Component<DataFileProps> {
               )}
             </CheckboxGroup>
           </div>
-          <div style={{ textAlign: "center", paddingTop: "5vh" }}>
-            <Title level={4}>Unrestricted files in the same dataset</Title>
-          </div>
-          <div
-            style={{
-              paddingTop: "4vh",
-              paddingBottom: "3vh",
-              //display: "block",
-              //marginRight: 10,
-            }}
-          >
-            <ol style={{ paddingLeft: "16px" }}>
-              {authStore?.dataFiles.map(
-                (file, index) =>
-                  !file.restricted && (
-                    <li
-                      key={`${file.id}-${index}`}
-                      style={{ marginBottom: "2vh" }}
-                    >
-                      <div key={file.label} style={{ marginBottom: "1vh" }}>
-                        {file.label}
-                      </div>
-                      <div key={file.description}>
-                        Description: {file.description}
-                      </div>
-                      <div>
-                        {file.tags.length > 0 &&
-                          file.tags.map((tag, index) => (
-                            <Tag key={`${file.id}-${tag}`} color="#108ee9">
-                              {tag}
-                            </Tag>
-                          ))}
-                      </div>
-                    </li>
-                  )
-              )}
-            </ol>
-          </div>
+          {authStore?.dataFiles &&
+            authStore?.dataFiles.some((file) => file.restricted === false) && (
+              <>
+                <div style={{ textAlign: "center", paddingTop: "5vh" }}>
+                  <Title level={4}>
+                    Unrestricted files in the same dataset
+                  </Title>
+                </div>
+                <div
+                  style={{
+                    paddingTop: "4vh",
+                    paddingBottom: "3vh",
+                    //display: "block",
+                    //marginRight: 10,
+                  }}
+                >
+                  <ol style={{ paddingLeft: "16px" }}>
+                    {authStore?.dataFiles.map(
+                      (file, index) =>
+                        !file.restricted && (
+                          <li
+                            key={`${file.id}-${index}`}
+                            style={{ marginBottom: "2vh" }}
+                          >
+                            <div
+                              key={file.label}
+                              style={{ marginBottom: "1vh" }}
+                            >
+                              {file.label}
+                            </div>
+                            <div key={file.description}>
+                              Description: {file.description}
+                            </div>
+                            <div>
+                              {file.tags.length > 0 &&
+                                file.tags.map((tag, index) => (
+                                  <Tag
+                                    key={`${file.id}-${tag}`}
+                                    color="#108ee9"
+                                  >
+                                    {tag}
+                                  </Tag>
+                                ))}
+                            </div>
+                          </li>
+                        )
+                    )}
+                  </ol>
+                </div>
+              </>
+            )}
         </Col>
         <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={2} />
       </Row>

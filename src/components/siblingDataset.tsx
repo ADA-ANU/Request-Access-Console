@@ -75,7 +75,7 @@ const SiblingDataset = ({
     () => (
       <>
         <div style={{ display: "flex" }}>
-          <Title level={5} style={{ width: "85%" }}>
+          <Title level={5}>
             <a href={dataset.url} target="_blank">
               {dataset.dataset_title}
             </a>
@@ -105,8 +105,10 @@ const SiblingDataset = ({
                 <div
                   key={file.id}
                   style={{
+                    marginTop: "2vh",
                     marginBottom: "4vh",
                     marginRight: "1vw",
+                    textAlign: "left",
                   }}
                 >
                   {/* <Row key={file.id} style={{ marginBottom: "5vh" }}> */}

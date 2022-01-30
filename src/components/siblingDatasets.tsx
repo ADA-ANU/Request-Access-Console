@@ -5,11 +5,12 @@ import {
   Checkbox,
   Row,
   Col,
-  Input,
+  Collapse,
   message,
   Tag,
   Typography,
 } from "antd";
+import { CaretRightOutlined } from "@ant-design/icons";
 import API_URL from "../config";
 import axios, { AxiosRequestConfig } from "axios";
 import apiagent from "../stores/apiagent";
@@ -25,6 +26,8 @@ const { Title, Text } = Typography;
 import authStore, { AuthStore } from "../stores/authStore";
 import { FormInstance } from "antd/lib/form";
 const CheckboxGroup = Checkbox.Group;
+const { Panel } = Collapse;
+
 // interface ReturnFileType{
 //     name: string
 // }
@@ -54,42 +57,67 @@ export default class SiblingDatasets extends React.Component<SiblingDatasetsProp
         <Col xs={22} sm={22} md={20} lg={18} xl={16} xxl={20}>
           <div
             id="siblingDatasets"
-            style={{ textAlign: "center", paddingTop: "3vh" }}
-          >
-            <Title level={4}>
-              Request access to restricted files in sibling datasets
-            </Title>
-          </div>
-          <div
             style={{
-              paddingTop: "4vh",
-              //display: "block",
-              marginRight: 10,
-              width: "100%",
+              textAlign: "center",
+              paddingTop: "3vh",
+              paddingBottom: "3vh",
             }}
           >
-            {authStore!.siblingDatasets &&
-              authStore!.siblingDatasets.length > 0 &&
-              authStore!.siblingDatasets!.map(
-                (dataset: siblingDataset, idx: number) => (
-                  <SiblingDataset
-                    key={dataset.id}
-                    dataset={dataset}
-                    authStore={this.props.authStore}
-                    isLastItem={idx === authStore!.siblingDatasets.length - 1}
-                    checkedDataFiles={authStore?.checkedDataFiles.get(
-                      Number(dataset.id)
-                    )}
-                    siblingCheckAllOnChange={(
-                      datasetID: number,
-                      datafileIDs: number[]
-                    ) =>
-                      authStore!.siblingCheckAllOnChange(datasetID, datafileIDs)
-                    }
-                    submitted={authStore!.submitted}
-                  />
-                )
+            <Collapse
+              bordered={false}
+              expandIcon={({ isActive }) => (
+                <CaretRightOutlined rotate={isActive ? 90 : 0} />
               )}
+              //className="site-collapse-custom-collapse"
+              ghost
+            >
+              <Panel
+                header={
+                  <Title level={4}>
+                    Request access to restricted files in sibling datasets
+                  </Title>
+                }
+                key="1"
+                //className="site-collapse-custom-panel"
+              >
+                <div
+                // style={{
+                //   paddingTop: "4vh",
+                //   //display: "block",
+                //   marginRight: 10,
+                //   width: "100%",
+                // }}
+                >
+                  {authStore!.siblingDatasets &&
+                    authStore!.siblingDatasets.length > 0 &&
+                    authStore!.siblingDatasets!.map(
+                      (dataset: siblingDataset, idx: number) => (
+                        <SiblingDataset
+                          key={dataset.id}
+                          dataset={dataset}
+                          authStore={this.props.authStore}
+                          isLastItem={
+                            idx === authStore!.siblingDatasets.length - 1
+                          }
+                          checkedDataFiles={authStore?.checkedDataFiles.get(
+                            Number(dataset.id)
+                          )}
+                          siblingCheckAllOnChange={(
+                            datasetID: number,
+                            datafileIDs: number[]
+                          ) =>
+                            authStore!.siblingCheckAllOnChange(
+                              datasetID,
+                              datafileIDs
+                            )
+                          }
+                          submitted={authStore!.submitted}
+                        />
+                      )
+                    )}
+                </div>
+              </Panel>
+            </Collapse>
           </div>
         </Col>
         <Col xs={1} sm={1} md={2} lg={3} xl={4} xxl={2} />

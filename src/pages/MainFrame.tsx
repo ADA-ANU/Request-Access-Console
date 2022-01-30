@@ -746,7 +746,6 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             onCancel={() => authStore?.handleResultModal(false)}
             footer={null}
           >
-            {console.log(749, authStore?.submissionResult)}
             {authStore?.submissionResult?.data && (
               <div>
                 {authStore.submissionResult.data.map((result, index) => (

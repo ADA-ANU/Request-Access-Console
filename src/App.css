@@ -50,6 +50,15 @@ hr {
   height: auto !important;
 }
 
+h4.ant-typography {
+  margin-bottom: 0 !important;
+}
+
+.ant-collapse-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 @media (max-width: 576px) {
   .hidden-xs {
     display: none !important;
