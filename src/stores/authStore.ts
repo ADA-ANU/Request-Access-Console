@@ -359,44 +359,38 @@ export class AuthStore {
     if (!this.token) {
       return alert("Session expired, please reload the page ... ");
     }
-    this.formRef.current
-      ?.validateFields()
-      .then((values) => {
-        this.submitting = true;
-        console.log(values);
-        apiagent
-          .post(API_URL.SAVERESPONSES, {
-            token: this.token,
-            responses: values,
-            checkedDataFiles: this.checkedDataFiles.get(
-              this.datasetID_orginalRequest
-            ),
-            emailNotification: this.emailNotification,
-          })
-          .then(
-            action((json) => {
-              this.resultModal("save");
-            })
-          )
-          .catch((error) => {
-            console.log(error);
-            if (error.status === 401) {
-              this.authenticated = false;
-              this.errorMsg =
-                "Session expired, please proceed to Dataverse to start over again.";
-            } else {
-              this.openNotification(error.data);
-            }
-          })
-          .finally(
-            action(() => {
-              setTimeout(() => (this.submitting = false), 1000);
-            })
-          );
+    const values = this.formRef.current?.getFieldsValue();
+    this.submitting = true;
+    console.log(values);
+    apiagent
+      .post(API_URL.SAVERESPONSES, {
+        token: this.token,
+        responses: values,
+        checkedDataFiles: this.checkedDataFiles.get(
+          this.datasetID_orginalRequest
+        ),
+        emailNotification: this.emailNotification,
       })
-      .catch((errorInfo) => {
-        console.log(errorInfo);
-      });
+      .then(
+        action((json) => {
+          this.resultModal("save");
+        })
+      )
+      .catch((error) => {
+        console.log(error);
+        if (error.status === 401) {
+          this.authenticated = false;
+          this.errorMsg =
+            "Session expired, please proceed to Dataverse to start over again.";
+        } else {
+          this.openNotification(error.data);
+        }
+      })
+      .finally(
+        action(() => {
+          setTimeout(() => (this.submitting = false), 1000);
+        })
+      );
 
     // setTimeout(() => {
     //   this.submitting = false;
