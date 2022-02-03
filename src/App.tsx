@@ -6,6 +6,7 @@ import "./App.css";
 import { AuthStore } from "./stores/authStore";
 import { Switch, Route, withRouter, Link } from "react-router-dom";
 import unauthorised from "./components/unauthorised";
+import WarningPage from "./components/warningPage";
 interface AppProps {
   authStore?: AuthStore;
 }
@@ -19,6 +20,7 @@ export default class App extends React.Component<AppProps> {
     return (
       <Switch>
         <Route exact path="/unauthorised" component={unauthorised} />
+        <Route exact path="/warning" component={WarningPage} />
         <Route component={MainFrame} />
       </Switch>
     );

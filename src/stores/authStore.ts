@@ -52,7 +52,7 @@ export class AuthStore {
   @observable restaurantInfo: RestaurantType = {} as RestaurantType;
   @observable wsOrders: Array<string> = [];
   @observable companyShops: Array<RestaurantType> = [];
-  @observable formRef = React.createRef<FormInstance>();
+  @observable customquestionFormRef = React.createRef<FormInstance>();
   @observable responseValues: { [k: number]: any } = {};
   @observable token: string | undefined;
   @observable authenticated: boolean = true;
@@ -234,7 +234,7 @@ export class AuthStore {
       this.uploadedFiles.set(qID, [...prevArray, name]);
     }
     this.handleValidationError(false);
-    this.formRef.current?.validateFields();
+    this.customquestionFormRef.current?.validateFields();
   }
   @action deleteFile(qID: number, file: any) {
     //console.log(`${API_URL.HANDLE_FILE_DELETE}${file.fileName}`);
@@ -269,7 +269,7 @@ export class AuthStore {
     this.errorMsg = value;
   }
   @action confirmModal() {
-    this.formRef.current
+    this.customquestionFormRef.current
       ?.validateFields()
       .then(
         action((values) => {
@@ -317,7 +317,7 @@ export class AuthStore {
     apiagent
       .post(API_URL.SUBMITRESPONSES, {
         token: this.token,
-        responses: values,
+        responses: { customQuestionResponse: values },
         checkedDataFiles: checkedDatafileIDs,
       })
       .then(
@@ -359,7 +359,7 @@ export class AuthStore {
     if (!this.token) {
       return alert("Session expired, please reload the page ... ");
     }
-    const values = this.formRef.current?.getFieldsValue();
+    const values = this.customquestionFormRef.current?.getFieldsValue();
     this.submitting = true;
     console.log(values);
     apiagent

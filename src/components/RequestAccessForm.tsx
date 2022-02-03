@@ -79,7 +79,7 @@ export default class RequestAccessForm extends React.Component<
           >
             <Form
               id="requestAccess"
-              ref={authStore?.formRef}
+              ref={authStore?.customquestionFormRef}
               layout="vertical"
               size={"large"}
               scrollToFirstError

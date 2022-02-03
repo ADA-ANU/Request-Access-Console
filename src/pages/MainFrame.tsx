@@ -61,13 +61,16 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
   };
   componentDidMount() {
     const pathname = this.props.routingStore?.location.pathname;
+    console.log(pathname?.split("/")[1]);
     const param = pathname?.split("/")[1];
     //console.log(param);
     if (!param || param === "") {
       this.props.authStore?.unauthorised(
         `Please access this application through https://dataverse.ada.edu.au`
       );
-    } else this.props.authStore?.init(param);
+    } else if (param !== "warning") {
+      this.props.authStore?.init(param);
+    }
     const notification = localStorage.getItem("ADA_Request_Access");
     if (
       notification &&
@@ -145,7 +148,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
   };
 
   handleSubmit = () => {
-    const values = authStore?.formRef.current?.getFieldsValue();
+    const values = authStore?.customquestionFormRef.current?.getFieldsValue();
     console.log("Received values of form: ", values);
 
     this.props.authStore?.submit(values);
