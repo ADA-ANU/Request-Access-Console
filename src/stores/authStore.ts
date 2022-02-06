@@ -22,6 +22,7 @@ import {
 import { file } from "jszip";
 import { RcFile } from "antd/lib/upload";
 import { CheckboxChangeEvent } from "../../node_modules/antd/es/checkbox";
+import { errorMessage } from "../util";
 
 export class AuthStore {
   // @observable token = window.localStorage.getItem('jwt');
@@ -259,7 +260,7 @@ export class AuthStore {
         .catch((error) => {
           console.log(error);
 
-          this.openNotification(error.data);
+          this.openNotification(error.data ? error.data : errorMessage);
         });
     }
   }
@@ -328,7 +329,7 @@ export class AuthStore {
           //   json.some((ele: any) => ele.status === "ERROR") ? false : true
           // );
           const { data, hasError } = json;
-          this.submitted = hasError;
+          this.submitted = !hasError;
           this.hasError = hasError;
           console.log(this.submitted);
           this.showResultModal = true;
@@ -344,7 +345,7 @@ export class AuthStore {
           this.errorMsg =
             "Session expired, please proceed to Dataverse to start over again.";
         } else {
-          this.openNotification(error.data ? error.data : error.statusText);
+          this.openNotification(error.data ? error.data : errorMessage);
         }
       })
       .finally(
@@ -365,7 +366,7 @@ export class AuthStore {
     apiagent
       .post(API_URL.SAVERESPONSES, {
         token: this.token,
-        responses: values,
+        responses: { customQuestionResponse: values },
         checkedDataFiles: this.checkedDataFiles.get(
           this.datasetID_orginalRequest
         ),
@@ -383,7 +384,7 @@ export class AuthStore {
           this.errorMsg =
             "Session expired, please proceed to Dataverse to start over again.";
         } else {
-          this.openNotification(error.data);
+          this.openNotification(error.data ? error.data : errorMessage);
         }
       })
       .finally(
