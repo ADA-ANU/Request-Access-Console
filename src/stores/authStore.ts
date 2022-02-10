@@ -110,10 +110,6 @@ export class AuthStore {
         })
         .then(
           action((json) => {
-            console.log(json);
-            // console.log(json.responseValues);
-            // console.log(json.info, json.submitted);
-            //console.log(json.terms);
             this.datasetURL = json.datasetURL;
             this.siblingDatasets = json.siblingDatasets;
             this.datasetID_orginalRequest = Number(json.info.dataset_id);
@@ -198,10 +194,7 @@ export class AuthStore {
             );
             //alert(error.data);
           } else if (error.status === 405) {
-            console.log("6666");
-            this.unauthorised(
-              "Email unconfirmed, please proceed to Dataverse to confirm your email."
-            );
+            this.unauthorised("email unverified");
           } else {
             console.log("777", error.data ? error.data : error);
             this.unauthorised(

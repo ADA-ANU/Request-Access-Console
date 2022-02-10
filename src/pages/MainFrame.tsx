@@ -43,6 +43,7 @@ import DataFile from "../components/dataFile";
 import SiblingDatasets from "../components/siblingDatasets";
 import "../App.css";
 import { datafile } from "../stores/data";
+import EmailVerificationMessage from "../components/emailVerificationMessage";
 const { Title, Text, Paragraph } = Typography;
 const { Header, Content, Footer } = Layout;
 const CheckboxGroup = Checkbox.Group;
@@ -61,7 +62,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
   };
   componentDidMount() {
     const pathname = this.props.routingStore?.location.pathname;
-    console.log(pathname?.split("/")[1]);
+
     const param = pathname?.split("/")[1];
     //console.log(param);
     if (!param || param === "") {
@@ -537,7 +538,11 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                 }}
                 src={warningLogo}
               />
-              <Title level={3}>{this.urlify(authStore?.errorMsg!)}</Title>
+              {authStore?.errorMsg === "email unverified" ? (
+                <EmailVerificationMessage />
+              ) : (
+                <Title level={3}>{this.urlify(authStore?.errorMsg!)}</Title>
+              )}
             </div>
           )}
 

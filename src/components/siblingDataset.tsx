@@ -25,7 +25,6 @@ const SiblingDataset = ({
 }: sibling) => {
   const [selectAllChecked, toggleSelectAll] = useState(false);
   const [indeterminate, toggleIndeterminate] = useState(false);
-  console.log(dataset, submitted);
 
   const getAllowedToBeCheckedDatafileID = () => {
     const datafileID_allowedToBeChecked = dataset.datafiles

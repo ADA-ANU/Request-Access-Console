@@ -65,7 +65,6 @@ export default class RequestAccessForm extends React.Component<
 
   render() {
     const { authStore, uploadQIDwithError } = this.props;
-    console.log(toJS(authStore?.questions));
     return (
       <Row>
         <Col xs={1} sm={2} md={2} lg={3} xl={4} xxl={2} />

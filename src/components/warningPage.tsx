@@ -29,6 +29,8 @@ const warningPage = (props: any) => {
       <Title level={3} type="danger">
         {message === "Token has been used."
           ? "This link has been used, please contact ADA access team for help."
+          : message === "Failed to delete fileaccessrequest."
+          ? "Your request has been either awarded or rejected, please proceed to Dataverse to download or start over agin."
           : message}
       </Title>
     </div>
