@@ -423,7 +423,10 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                         boxShadow: "0 16px 64px -16px rgb(46 55 77 / 8%)",
                       }}
                     >
-                      {authStore?.dataFiles && <SiblingDatasets />}
+                      {authStore!.siblingDatasets &&
+                        authStore!.siblingDatasets.length > 0 && (
+                          <SiblingDatasets />
+                        )}
                     </div>
                   </Col>
                   <Col xs={1} sm={1} md={4} lg={3} xl={4} xxl={6} />
