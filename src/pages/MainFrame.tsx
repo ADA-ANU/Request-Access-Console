@@ -86,7 +86,6 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     e.preventDefault();
   };
   submissionCheck = () => {
-    console.log("checking");
     // let qidWithError: number[] = [];
     // this.props.authStore?.uploadedFiles.forEach(
     //   (value: string[], key: number) => {
@@ -106,7 +105,6 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
     //     };
     //   });
     // } else {
-    console.log("checking");
     this.props.authStore?.confirmModal();
     //}
   };
@@ -150,7 +148,6 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
 
   handleSubmit = () => {
     const values = authStore?.customquestionFormRef.current?.getFieldsValue();
-    console.log("Received values of form: ", values);
 
     this.props.authStore?.submit(values);
   };
@@ -760,14 +757,22 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
             {authStore?.submissionResult?.data && (
               <div>
                 {authStore.submissionResult.data.map((result, index) => (
-                  <>
-                    <Text strong style={{ paddingLeft: "22px" }}>
+                  <div key={`result_${index}`}>
+                    <Text
+                      key={`title_${index}`}
+                      strong
+                      style={{ paddingLeft: "22px" }}
+                    >
                       {result.datasetTitle}
                     </Text>
-                    <Text strong style={{ paddingLeft: "22px" }}>
+                    <Text
+                      key={`ticket_${index}`}
+                      strong
+                      style={{ paddingLeft: "22px" }}
+                    >
                       Ticket Number: {result.ticketID}
                     </Text>
-                    <ol style={{ marginTop: "2vh" }}>
+                    <ol key={index} style={{ marginTop: "2vh" }}>
                       {result.result.map((file: any, index: number) => (
                         <li
                           key={index}
@@ -781,7 +786,7 @@ export default class MainFrame extends React.Component<IMainFrameProps> {
                         </li>
                       ))}
                     </ol>
-                  </>
+                  </div>
                 ))}
               </div>
             )}

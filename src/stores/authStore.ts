@@ -153,7 +153,6 @@ export class AuthStore {
             this.inputCheckedDataFiles = json.info.inputDataFileIDs;
             this.onChange(json.info.inputDataFileIDs);
             this.userEmail = json.info.email;
-            console.log(json.responseValues);
             //json.responseValues[755] = undefined;
             this.responseValues = json.responseValues;
             this.questions = json.guestbook;
@@ -176,7 +175,6 @@ export class AuthStore {
             this.datasetTitle = dataset_title;
             this.doi = DOI;
             this.submitted = json.submitted;
-            console.log(json.submittedFileIDs);
             this.submittedFileIDs = json.submittedFileIDs;
             this.unrestrictedFileIDs = json.unrestrictedFileIDs;
             this.countryList = json.countryList;
@@ -268,7 +266,6 @@ export class AuthStore {
       .then(
         action((values) => {
           this.handleValidationError(false);
-          console.log(toJS(values));
           this.showModal = true;
         })
       )
@@ -286,7 +283,6 @@ export class AuthStore {
   }
   @action submit(values: { [k: number]: any }) {
     this.submitting = true;
-    console.log(values);
 
     //this.handleModal(false);
     if (
@@ -316,7 +312,6 @@ export class AuthStore {
       })
       .then(
         action((json) => {
-          console.log(json);
           // console.log(
           //   json.some((ele: any) => ele.status === "ERROR"),
           //   json.some((ele: any) => ele.status === "ERROR") ? false : true
@@ -324,7 +319,6 @@ export class AuthStore {
           const { data, hasError } = json;
           this.submitted = !hasError;
           this.hasError = hasError;
-          console.log(this.submitted);
           this.showResultModal = true;
           this.submissionResult = json;
           //this.ticketID = ticketID;
@@ -355,7 +349,6 @@ export class AuthStore {
     }
     const values = this.customquestionFormRef.current?.getFieldsValue();
     this.submitting = true;
-    console.log(values);
     apiagent
       .post(API_URL.SAVERESPONSES, {
         token: this.token,
@@ -395,10 +388,13 @@ export class AuthStore {
     // }, 2000);
   }
   @action onChange = (list: any) => {
-    console.log(list);
     //console.log(this.submittedFileIDs.length);
-    console.log(this.dataFiles.length);
-    this.checkedDataFiles.set(this.datasetID_orginalRequest, list);
+    //console.log(this.dataFiles.length);
+    if (list.length > 0) {
+      this.checkedDataFiles.set(this.datasetID_orginalRequest, list);
+    } else {
+      this.checkedDataFiles.delete(this.datasetID_orginalRequest);
+    }
     this.indeterminate =
       !!list.length &&
       list.length <
@@ -454,7 +450,6 @@ export class AuthStore {
     }
   }
   @action termsOnchange = (list: any) => {
-    console.log(list);
     this.termsCheckboxValues = list;
   };
 
